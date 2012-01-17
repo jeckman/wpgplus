@@ -106,10 +106,13 @@ function wpgplus_update_profile_status($post_id) {
 	global $more; 
 	$more = 0; //only the post teaser please 
 	$my_post = get_post($post_id); 
-	if(($my_post->post_excerpt) && ($my_post->post_excerpt != '')) {
-		$my_post_text = stripslashes(wp_filter_nohtml_kses(apply_filters('the_content',$my_post->post_excerpt)));
-	} else { 
-		$my_post_text = stripslashes(wp_filter_nohtml_kses(apply_filters('the_content',$my_post->post_content)));
+	$my_post_text = get_post_meta($post_id,'wpgplus_message',true);  // if we have a post_message
+	if ($my_post_text == '') {
+		if(($my_post->post_excerpt) && ($my_post->post_excerpt != '')) {
+			$my_post_text = stripslashes(wp_filter_nohtml_kses(apply_filters('the_content',$my_post->post_excerpt)));
+		} else { 
+			$my_post_text = stripslashes(wp_filter_nohtml_kses(apply_filters('the_content',$my_post->post_content)));
+		}
 	}
     if(strlen($my_post_text) >= 995) {
 		$space_index = strrpos(substr($my_post_text, 0, 995), ' ');

@@ -5,8 +5,8 @@ Date: 2012, January 16th
 Description: Plugin to cross-post WordPress blog posts to Google+ 
 Author: John Eckman
 Author URI: http://johneckman.com
-Version: 0.5
-Stable tag: 0.5
+Version: 0.6
+Stable tag: 0.6
 */
   
 /*
@@ -130,7 +130,7 @@ function wpgplus_subpanel() {
 			echo '<div class="wrap"><p>Sorry, you are not allowed to access ';
 			echo 'this page.</p></div>';
 	}
-}	
+}  // end 	
   
 /*
  * This function handles publish to Google+. 
@@ -171,6 +171,7 @@ function wpgplus_publish_to_gplus($post) {
 function wpgplus_meta_box() {
   global $post;
   $wpgplus_publish = get_post_meta($post->ID, 'wpgplus_publish', true);
+  $wpgplus_message = get_post_meta($post->ID, 'wpgplus_message', true); 
   if ($wpgplus_publish == '') {
     $wpgplus_publish = 'yes';
   }
@@ -179,9 +180,14 @@ function wpgplus_meta_box() {
   checked('yes', $wpgplus_publish, true);
   echo ' /> <label for="wpgplus_publish_yes">'.__('yes', 'wpgplus').'</label> &nbsp;&nbsp;';
   echo '<input type="radio" name="wpgplus_publish" id="wpgplus_publish_no" value="no" ';
-  checked('no', $wpgplus_publish, false);
+  checked('no', $wpgplus_publish, true);
   echo ' /> <label for="wpgplus_publish_no">'.__('no', 'wpgplus').'</label>';
   echo '</p>';
+  echo '<p>'.__('Message for Google+ post: (use google+ markup)','wpgplus').'<br/>';
+  echo '<p><textarea cols="60" rows="4" style="width:95%" name="wpgplus_message" id="wpgplus_message">';
+  echo $wpgplus_message;
+  echo '</textarea></p>';
+  
   do_action('wpgplus_store_post_options');
 }
   
@@ -194,10 +200,7 @@ function wpgplus_add_meta_box() {
   }
 }
   
-function wpgplus_store_post_options($post_id, $post = false) {
-  if (!$post || $post->post_type == 'revision') { // store the metadata with the post, not the revision
-		return;
-	}  
+function wpgplus_store_post_options($post_id, $post = false) {  
   $wpgplusOptions = wpgplus_getAdminOptions();
   $post = get_post($post_id);
   $stored_meta = get_post_meta($post_id, 'wpgplus_publish', true);
@@ -218,6 +221,10 @@ function wpgplus_store_post_options($post_id, $post = false) {
     $save = false;
   }
     
+  if($_POST['wpgplus_message']) {
+	if(!update_post_meta($post_id, 'wgplus_message', $_POST['wpgplus_message']))
+		add_post_meta($post_id, 'wpgplus_message', $_POST['wpgplus_message']);
+  }  
   if ($save) {
     if (!update_post_meta($post_id, 'wpgplus_publish', $meta)) {
       add_post_meta($post_id, 'wpgplus_publish', $meta);

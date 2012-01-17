@@ -1,7 +1,7 @@
 === WPGPlus ===
 Contributors: johneckman
 Tags: google plus, platform, application, blog
-Stable tag: 0.5
+Stable tag: 0.6
 Tested up to: 3.3
 Requires at least: 2.9
 
@@ -44,6 +44,8 @@ See https://github.com/DmitrySandalov/twitter2gplus
 
 
 == Changelog ==
+= 0.6 = 
+* Added post-meta box for Google+ message
 
 = 0.5 =
 * Initial release
