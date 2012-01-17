@@ -7,7 +7,9 @@ Requires at least: 2.9
 
 WPGPlus posts your blog posts to Google+ when published on WordPress blog. 
 
-Posts are made to "Public" circle. If you include an excerpt (using the
+Posts are made to "Public" circle. 
+
+If you include an excerpt (using the
 post excerpt box, not just the "teaser" before the <more> tag) it will
 be used, otherwise post-content is used. 
 
@@ -26,8 +28,6 @@ This plugin requires PHP 5.
 
 This plugin is based on Dmitry Sandalov's standalone PHP script for 
 publishing to Google+ from php. 
-
-See https://github.com/DmitrySandalov/twitter2gplus
 
 == Installation ==
 
