@@ -106,6 +106,12 @@ function wpgplus_update_profile_status($post_id) {
 	global $more; 
 	$more = 0; //only the post teaser please 
 	$my_post = get_post($post_id); 
+	if(!empty($my_post->post_password)) { // post is password protected, don't post
+		return;
+	}
+	if(get_post_type($my_post->ID) != 'post') { // only do this for posts
+		return;
+	}
 	$my_post_text = get_post_meta($post_id,'wpgplus_message',true);  // if we have a post_message
 	if ($my_post_text == '') {
 		if(($my_post->post_excerpt) && ($my_post->post_excerpt != '')) {
