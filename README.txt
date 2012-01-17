@@ -48,3 +48,8 @@ See https://github.com/DmitrySandalov/twitter2gplus
 = 0.5 =
 * Initial release
 
+== To-do ==
+* Add "google+ message" meta-box rather than excerpt, allowing markdown style
+* Get google+ to recognize URL of permalink and treat it as it does from
+  web client
+* Explore full web interface not mobile one, which is limited in functionality
