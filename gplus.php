@@ -49,6 +49,7 @@ function wpgplus_login_data() {
 		foreach ($wpgplusOptions as $key => $option)
 		$wpgplusOptions[$key] = $option;
 	}
+	$wpgplus_debug_file= WP_PLUGIN_DIR .'/wpgplus/debug.txt';
 	$fp = @fopen($wpgplus_debug_file, 'a');
 	$debug_string=date("Y-m-d H:i:s",time())." : wgplus_safe_post_google running, username is ". $wpgplusOptions['wpgplus_username'] ."\n";
 	$debug_string .= "password is " .$wpgplusOptions['wpgplus_password'] . "\n";
