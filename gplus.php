@@ -70,7 +70,7 @@ function wpgplus_login_data() {
 	//echo "\n buf was" .$buf  ." \n";
     $toreturn = '';
     $doc = new DOMDocument;
-    $doc->loadHTML($buf);
+    @$doc->loadHTML($buf);
     $inputs = $doc->getElementsByTagName('input');
     foreach ($inputs as $input) {
 		switch ($input->getAttribute('name')) {
@@ -143,7 +143,7 @@ function wpgplus_update_profile_status($post_id) {
     //}
     $params = '';
     $doc = new DOMDocument;
-    $doc->loadxml($buf);
+    @$doc->loadHTML($buf);
 	//echo "<pre>" . $buf . "</pre> \n";
     $inputs = $doc->getElementsByTagName('input');
     foreach ($inputs as $input) {
