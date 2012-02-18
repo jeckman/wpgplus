@@ -1,7 +1,7 @@
 === WPGPlus ===
 Contributors: johneckman
 Tags: google plus, platform, application, blog
-Stable tag: 0.6
+Stable tag: 0.7
 Tested up to: 3.3
 Requires at least: 2.9
 
@@ -39,6 +39,11 @@ publishing to Google+ from php.
 
 
 == Changelog ==
+
+= 0.7 = 
+* Added more debugging output
+* Shifted to loadHTML, suppressed warnings from loading DOM
+
 = 0.6 = 
 * Added post-meta box for Google+ message
 

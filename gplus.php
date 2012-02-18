@@ -14,14 +14,13 @@
 // Kichrum http://Kichrum.org.ua
 
 // (!) Works only with Google 2-step auth turned off
-// (!) Needs 2 blank 600 files: cookie.txt
 
 $wpgplus_debug_file= WP_PLUGIN_DIR .'/wpgplus/debug.txt';
 
 function wpgplus_safe_post_google($post_id) {
 	$wpgplus_debug_file= WP_PLUGIN_DIR .'/wpgplus/debug.txt';
 	$fp = @fopen($wpgplus_debug_file, 'a');
-	$debug_string=date("Y-m-d H:i:s",time())." : wgplus_safe_post_google running, post_url " . $post_url ."\n";
+	$debug_string=date("Y-m-d H:i:s",time())." : wgplus_safe_post_google running, post_id is " . $post_id ."\n";
 	fwrite($fp, $debug_string);
 	
 	@unlink(WP_PLUGIN_DIR .'/wpgplus/cookies.txt'); //delete previous cookie file if exists
@@ -31,9 +30,9 @@ function wpgplus_safe_post_google($post_id) {
 	$fp = @fopen($wpgplus_debug_file, 'a');
 	$debug_string=date("Y-m-d H:i:s",time())." : wgplus_safe_post_google running,  past log in\n";
 	fwrite($fp, $debug_string);
-	sleep(1);
+	sleep(5);
 	wpgplus_update_profile_status($post_id);
-	sleep(1);
+	sleep(5);
 	$fp = @fopen($wpgplus_debug_file, 'a');
 	$debug_string=date("Y-m-d H:i:s",time())." : wgplus_safe_post_google running,  past update\n";
 	fwrite($fp, $debug_string);
@@ -55,7 +54,6 @@ function wpgplus_login_data() {
 	$debug_string .= "password is " .$wpgplusOptions['wpgplus_password'] . "\n";
 	fwrite($fp, $debug_string);	
 	
-	
 	$ch = curl_init();
     curl_setopt($ch, CURLOPT_COOKIEJAR,WP_PLUGIN_DIR .'/wpgplus/cookies.txt');
     curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/4.0 (compatible; MSIE 5.0; S60/3.0 NokiaN73-1/2.0(2.0617.0.0.7) Profile/MIDP-2.0 Configuration/CLDC-1.1)');
@@ -66,8 +64,6 @@ function wpgplus_login_data() {
     $buf = utf8_decode(html_entity_decode(curl_exec($ch)));
     curl_close($ch);
 
-    //echo "\n[+] Sending GET request to: https://plus.google.com/\n\n";
-	//echo "\n buf was" .$buf  ." \n";
     $toreturn = '';
     $doc = new DOMDocument;
     @$doc->loadHTML($buf);
@@ -85,6 +81,7 @@ function wpgplus_login_data() {
 
 // POST login: https://accounts.google.com/ServiceLoginAuth
 function wpgplus_login($postdata) {
+	$wpgplus_debug_file= WP_PLUGIN_DIR .'/wpgplus/debug.txt';
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_COOKIEJAR, WP_PLUGIN_DIR .'/wpgplus/cookies.txt');
     curl_setopt($ch, CURLOPT_COOKIEFILE, WP_PLUGIN_DIR .'/wpgplus/cookies.txt');
@@ -95,22 +92,32 @@ function wpgplus_login($postdata) {
     curl_setopt($ch, CURLOPT_POST, 1);
     curl_setopt($ch, CURLOPT_POSTFIELDS, $postdata[0]);
     $buf = curl_exec($ch); #this is not the g+ home page, because the b**** doesn't redirect properly
-    curl_close($ch);
-    //if ($GLOBALS['debug']) {
-	//	echo $buf;
-    //}
+    
+	$fp = @fopen($wpgplus_debug_file, 'a');
+	$debug_string=date("Y-m-d H:i:s",time())." : login data posted\n";
+	$debug_string .= date("Y-m-d H:i:s",time())." : status code was ". curl_getinfo($ch, CURLINFO_HTTP_CODE) ."\n";
+	fwrite($fp, $debug_string);
+	
+	curl_close($ch);
+
 	//echo "\n[+] Sending POST request to: " . $postdata[1] . "\n\n";
 }
 
-// GET status update form: Parse the webpage and collect form data
 function wpgplus_update_profile_status($post_id) {
+	$wpgplus_debug_file= WP_PLUGIN_DIR .'/wpgplus/debug.txt';
 	global $more; 
 	$more = 0; //only the post teaser please 
 	$my_post = get_post($post_id); 
 	if(!empty($my_post->post_password)) { // post is password protected, don't post
+		$fp = @fopen($wpgplus_debug_file, 'a');
+		$debug_string=date("Y-m-d H:i:s",time())." : Post is password protected\n";
+		fwrite($fp, $debug_string);
 		return;
 	}
 	if(get_post_type($my_post->ID) != 'post') { // only do this for posts
+		$fp = @fopen($wpgplus_debug_file, 'a');
+		$debug_string=date("Y-m-d H:i:s",time())." : Post type is ". get_post_type($my_post->ID) ."\n";
+		fwrite($fp, $debug_string);
 		return;
 	}
 	$my_post_text = get_post_meta($post_id,'wpgplus_message',true);  // if we have a post_message
@@ -128,6 +135,10 @@ function wpgplus_update_profile_status($post_id) {
 		$my_post_text = $short_desc;
 	}
 	
+	$fp = @fopen($wpgplus_debug_file, 'a');
+	$debug_string=date("Y-m-d H:i:s",time())." : Getting form for posting\n";
+	fwrite($fp, $debug_string);
+
 	$ch = curl_init();
     curl_setopt($ch, CURLOPT_COOKIEJAR, WP_PLUGIN_DIR .'/wpgplus/cookies.txt');
     curl_setopt($ch, CURLOPT_COOKIEFILE, WP_PLUGIN_DIR .'/wpgplus/cookies.txt');
@@ -137,14 +148,14 @@ function wpgplus_update_profile_status($post_id) {
     curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
     $buf = utf8_decode(html_entity_decode(str_replace('&', '', curl_exec($ch))));
     $header = curl_getinfo($ch);
+	$fp = @fopen($wpgplus_debug_file, 'a');
+	$debug_string=date("Y-m-d H:i:s",time())." : Got form, status was ". curl_getinfo($ch, CURLINFO_HTTP_CODE) . "\n";
+	fwrite($fp, $debug_string);
     curl_close($ch);
-    //if ($GLOBALS['debug']) {
-	//	echo $buf;
-    //}
+    
     $params = '';
     $doc = new DOMDocument;
     @$doc->loadHTML($buf);
-	//echo "<pre>" . $buf . "</pre> \n";
     $inputs = $doc->getElementsByTagName('input');
     foreach ($inputs as $input) {
 	    if (($input->getAttribute('name') != 'editcircles')) {
@@ -156,6 +167,11 @@ function wpgplus_update_profile_status($post_id) {
     //$baseurl = $doc->getElementsByTagName('base')->item(0)->getAttribute('href');
     $baseurl = 'https://m.google.com' . parse_url($header['url'], PHP_URL_PATH);
 
+	$fp = @fopen($wpgplus_debug_file, 'a');
+	$debug_string=date("Y-m-d H:i:s",time())." : Going to publish, params is ". $params ."\n";
+	$debug_string=date("Y-m-d H:i:s",time())." : and base url is ". $baseurl ."\n";
+	fwrite($fp, $debug_string);
+	
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_COOKIEJAR, WP_PLUGIN_DIR .'/wpgplus/cookies.txt');
     curl_setopt($ch, CURLOPT_COOKIEFILE, WP_PLUGIN_DIR .'/wpgplus/cookies.txt');
@@ -169,12 +185,10 @@ function wpgplus_update_profile_status($post_id) {
     curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
     $buf = curl_exec($ch);
     $header = curl_getinfo($ch);
+	$fp = @fopen($wpgplus_debug_file, 'a');
+	$debug_string=date("Y-m-d H:i:s",time())." : Posted form, status was ". curl_getinfo($ch, CURLINFO_HTTP_CODE) . "\n";
+	fwrite($fp, $debug_string);
     curl_close($ch);
-    //if ($GLOBALS['debug']) {
-	//	echo $buf;
-    //}
-    //echo "\n[+] POST Updating status on: " . $baseurl . "\n\n";
-	//echo "\n post url was " . $post_url . "\n\n";
 }
 
 // GET logout: Just logout to look more human like and reset cookie :)
