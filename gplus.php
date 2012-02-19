@@ -151,6 +151,7 @@ function wpgplus_update_profile_status($post_id) {
     $header = curl_getinfo($ch);
 	$fp = @fopen($wpgplus_debug_file, 'a');
 	$debug_string=date("Y-m-d H:i:s",time())." : Got form, status was ". curl_getinfo($ch, CURLINFO_HTTP_CODE) . "\n";
+	$debug_string .= date("Y-m-d H:i:s",time())." : Response was:\n". $buf ."\n\n";
 	fwrite($fp, $debug_string);
     curl_close($ch);
     
