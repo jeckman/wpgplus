@@ -137,6 +137,7 @@ function wpgplus_update_profile_status($post_id) {
 	
 	$fp = @fopen($wpgplus_debug_file, 'a');
 	$debug_string=date("Y-m-d H:i:s",time())." : Getting form for posting\n";
+	$debug_string .= date("Y-m-d H:i:s",time())." : Post text is ". $my_post_text ."\n";
 	fwrite($fp, $debug_string);
 
 	$ch = curl_init();
@@ -187,6 +188,10 @@ function wpgplus_update_profile_status($post_id) {
     $header = curl_getinfo($ch);
 	$fp = @fopen($wpgplus_debug_file, 'a');
 	$debug_string=date("Y-m-d H:i:s",time())." : Posted form, status was ". curl_getinfo($ch, CURLINFO_HTTP_CODE) . "\n";
+	$debug_string .= date("Y-m-d H:i:s",time())." : Post text was ". $my_post_text ."\n";	
+	$debug_string .= date("Y-m-d H:i:s",time())." : Header of response was ". $header ."\n";
+	$debug_string .= date("Y-m-d H:i:s",time())." : Body was ". $buf ."\n";
+	
 	fwrite($fp, $debug_string);
     curl_close($ch);
 }
@@ -200,7 +205,7 @@ function wpgplus_logout() {
     curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/4.0 (compatible; MSIE 5.0; S60/3.0 NokiaN73-1/2.0(2.0617.0.0.7) Profile/MIDP-2.0 Configuration/CLDC-1.1)');
     curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
     curl_setopt($ch, CURLOPT_URL, 'https://www.google.com/m/logout');
-    $buf = curl_exec($ch);
+    $buf = curl_exec	($ch);
     curl_close($ch);
     //if ($GLOBALS['debug']) {
 	//	echo $buf;

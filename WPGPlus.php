@@ -173,10 +173,10 @@ function wpgplus_meta_box() {
   }
   echo '<p>'.__('Publish this post to Google Plus?', 'wpgplus').'<br/>';
   echo '<input type="radio" name="wpgplus_publish" id="wpgplus_publish_yes" value="yes" ';
-  checked('yes', $wpgplus_publish, true);
+  checked('yes',$wpgplus_publish);
   echo ' /> <label for="wpgplus_publish_yes">'.__('yes', 'wpgplus').'</label> &nbsp;&nbsp;';
   echo '<input type="radio" name="wpgplus_publish" id="wpgplus_publish_no" value="no" ';
-  checked('no', $wpgplus_publish, true);
+  checked('no',$wpgplus_publish);
   echo ' /> <label for="wpgplus_publish_no">'.__('no', 'wpgplus').'</label>';
   echo '</p>';
   echo '<p>'.__('Message for Google+ post: (use google+ markup)','wpgplus').'<br/>';
