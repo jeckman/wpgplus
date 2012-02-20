@@ -62,6 +62,10 @@ function wpgplus_login_data() {
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
     curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
     $buf = utf8_decode(html_entity_decode(curl_exec($ch)));
+	$fp = @fopen($wpgplus_debug_file, 'a');
+	$debug_string=date("Y-m-d H:i:s",time())." : just posted the login info\n";
+	$debug_string .= "\nBuffer is\n" . $buf . "\n";
+	fwrite($fp, $debug_string);	
     curl_close($ch);
 
     $toreturn = '';
@@ -96,11 +100,14 @@ function wpgplus_login($postdata) {
 	$fp = @fopen($wpgplus_debug_file, 'a');
 	$debug_string=date("Y-m-d H:i:s",time())." : login data posted\n";
 	$debug_string .= date("Y-m-d H:i:s",time())." : status code was ". curl_getinfo($ch, CURLINFO_HTTP_CODE) ."\n";
+	$debug_string .= "\n buffer was \n" . $buf ."\n";
 	fwrite($fp, $debug_string);
 	
 	curl_close($ch);
 
-	//echo "\n[+] Sending POST request to: " . $postdata[1] . "\n\n";
+	$fp = @fopen($wpgplus_debug_file, 'a');
+	$debug_string = "\n[+] Sending POST request to: " . $postdata[1] . "\n\n";
+	fwrite($fp, $debug_string); 
 }
 
 function wpgplus_update_profile_status($post_id) {
