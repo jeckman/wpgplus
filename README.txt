@@ -40,6 +40,8 @@ publishing to Google+ from php.
 
 == Changelog ==
 
+* Fixed bug in which message and publish meta were being duplicated
+
 = 0.7 = 
 * Added more debugging output
 * Shifted to loadHTML, suppressed warnings from loading DOM

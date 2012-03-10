@@ -165,68 +165,66 @@ function wpgplus_publish_to_gplus($post) {
  * posts to twitter
  */
 function wpgplus_meta_box() {
-  global $post;
-  $wpgplus_publish = get_post_meta($post->ID, 'wpgplus_publish', true);
-  $wpgplus_message = get_post_meta($post->ID, 'wpgplus_message', true); 
-  if ($wpgplus_publish == '') {
-    $wpgplus_publish = 'yes';
-  }
-  echo '<p>'.__('Publish this post to Google Plus?', 'wpgplus').'<br/>';
-  echo '<input type="radio" name="wpgplus_publish" id="wpgplus_publish_yes" value="yes" ';
-  checked('yes',$wpgplus_publish);
-  echo ' /> <label for="wpgplus_publish_yes">'.__('yes', 'wpgplus').'</label> &nbsp;&nbsp;';
-  echo '<input type="radio" name="wpgplus_publish" id="wpgplus_publish_no" value="no" ';
-  checked('no',$wpgplus_publish);
-  echo ' /> <label for="wpgplus_publish_no">'.__('no', 'wpgplus').'</label>';
-  echo '</p>';
-  echo '<p>'.__('Message for Google+ post: (use google+ markup)','wpgplus').'<br/>';
-  echo '<p><textarea cols="60" rows="4" style="width:95%" name="wpgplus_message" id="wpgplus_message">';
-  echo $wpgplus_message;
-  echo '</textarea></p>';
+	global $post;
+	$wpgplus_publish = get_post_meta($post->ID, 'wpgplus_publish', true);
+	$wpgplus_message = get_post_meta($post->ID, 'wpgplus_message', true); 
+	if ($wpgplus_publish == '') {
+		$wpgplus_publish = 'yes';
+	}
+	echo '<p>'.__('Publish this post to Google Plus?', 'wpgplus').'<br/>';
+	echo '<input type="radio" name="wpgplus_publish" id="wpgplus_publish_yes" value="yes" ';
+	checked('yes',$wpgplus_publish);
+	echo ' /> <label for="wpgplus_publish_yes">'.__('Yes', 'wpgplus').'</label> &nbsp;&nbsp;';
+	echo '<input type="radio" name="wpgplus_publish" id="wpgplus_publish_no" value="no" ';
+	checked('no',$wpgplus_publish);
+	echo ' /> <label for="wpgplus_publish_no">'.__('No', 'wpgplus').'</label>';
+	echo '</p>';
+	echo '<p>'.__('Message for Google+ post: (use google+ markup)','wpgplus').'<br/>';
+	echo '<p><textarea cols="60" rows="4" style="width:95%" name="wpgplus_message" id="wpgplus_message">';
+	echo $wpgplus_message;
+	echo '</textarea></p>';
   
-  do_action('wpgplus_store_post_options');
+	do_action('wpgplus_store_post_options');
 }
   
 function wpgplus_add_meta_box() {
-  global $wp_version;
-  if (version_compare($wp_version, '2.7', '>=')) {
-    add_meta_box('wpgplus_post_form','WPGPlus', 'wpgplus_meta_box', 'post', 'side');
-  } else {
-    add_meta_box('wpgplus_post_form','WPGPlus', 'wpgplus_meta_box', 'post', 'normal');
-  }
+	global $wp_version;
+	if (version_compare($wp_version, '2.7', '>=')) {
+		add_meta_box('wpgplus_post_form','WPGPlus', 'wpgplus_meta_box', 'post', 'side');
+	} else {
+		add_meta_box('wpgplus_post_form','WPGPlus', 'wpgplus_meta_box', 'post', 'normal');
+	}
 }
   
 function wpgplus_store_post_options($post_id, $post = false) {  
-  $wpgplusOptions = wpgplus_getAdminOptions();
-  $post = get_post($post_id);
-  $stored_meta = get_post_meta($post_id, 'wpgplus_publish', true);
-  $posted_meta = $_POST['wpgplus_publish'];
+	$wpgplusOptions = wpgplus_getAdminOptions();
+	$post = get_post($post_id);
+	$stored_meta = get_post_meta($post_id, 'wpgplus_publish', true);
+	$posted_meta = $_POST['wpgplus_publish'];
+	$wpgplus_message = $_POST['wpgplus_message'];
+  
+	$save = false;
+	/* if there is $posted_meta, that takes priority over stored */
+	if (!empty($posted_meta)) { 
+		$posted_meta == 'yes' ? $meta = 'yes' : $meta = 'no';
+		$save = true;
+	}
+	/* if no posted meta, check stored meta */ 
+	else if (empty($stored_meta)) {
+		$meta = 'yes';
+		$save = true;
+		/* if there is stored meta, and user didn't touch it, don't save */ 
+	} else {
+		$save = false;
+	}
     
-  $save = false;
-  /* if there is $posted_meta, that takes priority over stored */
-  if (!empty($posted_meta)) { 
-    $posted_meta == 'yes' ? $meta = 'yes' : $meta = 'no';
-    $save = true;
-  }
-  /* if no posted meta, check stored meta */ 
-  else if (empty($stored_meta)) {
-    $meta = 'yes';
-    $save = true;
-  /* if there is stored meta, and user didn't touch it, don't save */ 
-  } else {
-    $save = false;
-  }
-    
-  if($_POST['wpgplus_message']) {
-	if(!update_post_meta($post_id, 'wgplus_message', $_POST['wpgplus_message']))
-		add_post_meta($post_id, 'wpgplus_message', $_POST['wpgplus_message']);
-  }  
-  if ($save) {
-    if (!update_post_meta($post_id, 'wpgplus_publish', $meta)) {
-      add_post_meta($post_id, 'wpgplus_publish', $meta);
-    }
-  }
+	update_post_meta($post_id, 'wpgplus_message',$wpgplus_message); 
+	if ($save) {
+		update_post_meta($post_id, 'wpgplus_publish', $meta);
+	}
 }
+
+
 add_action('draft_post', 'wpgplus_store_post_options', 1, 2);
 add_action('publish_post', 'wpgplus_store_post_options', 1, 2);
 add_action('save_post', 'wpgplus_store_post_options', 1, 2);
