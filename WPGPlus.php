@@ -5,8 +5,8 @@ Date: 2012, January 16th
 Description: Plugin to cross-post WordPress blog posts to Google+ 
 Author: John Eckman
 Author URI: http://johneckman.com
-Version: 0.7
-Stable tag: 0.7
+Version: 0.7.1
+Stable tag: 0.7.1
 */
   
 /*

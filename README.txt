@@ -1,7 +1,7 @@
 === WPGPlus ===
 Contributors: johneckman
 Tags: google plus, platform, application, blog
-Stable tag: 0.7
+Stable tag: 0.7.1
 Tested up to: 3.3
 Requires at least: 2.9
 
@@ -40,7 +40,9 @@ publishing to Google+ from php.
 
 == Changelog ==
 
+= 0.7.1 =
 * Fixed bug in which message and publish meta were being duplicated
+* Turned off debug logging including password - not good for production environment
 
 = 0.7 = 
 * Added more debugging output
