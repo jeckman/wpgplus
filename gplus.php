@@ -21,7 +21,9 @@ function wpgplus_safe_post_google($post_id) {
 	$wpgplus_debug_file= WP_PLUGIN_DIR .'/wpgplus/debug.txt';
 	$fp = @fopen($wpgplus_debug_file, 'a');
 	$debug_string=date("Y-m-d H:i:s",time())." : wgplus_safe_post_google running, post_id is " . $post_id ."\n";
-	fwrite($fp, $debug_string);
+	if($fp) {
+		fwrite($fp, $debug_string);
+	}
 	
 	@unlink(WP_PLUGIN_DIR .'/wpgplus/cookies.txt'); //delete previous cookie file if exists
 	touch(WP_PLUGIN_DIR .'/wpgplus/cookies.txt'); //create a cookie file
@@ -29,14 +31,17 @@ function wpgplus_safe_post_google($post_id) {
 	wpgplus_login(wpgplus_login_data());
 	$fp = @fopen($wpgplus_debug_file, 'a');
 	$debug_string=date("Y-m-d H:i:s",time())." : wgplus_safe_post_google running,  past log in\n";
-	fwrite($fp, $debug_string);
+	if($fp) {
+		fwrite($fp, $debug_string);
+	}
 	sleep(5);
 	wpgplus_update_profile_status($post_id);
 	sleep(5);
 	$fp = @fopen($wpgplus_debug_file, 'a');
 	$debug_string=date("Y-m-d H:i:s",time())." : wgplus_safe_post_google running,  past update\n";
-	fwrite($fp, $debug_string);
-	
+	if($fp) {
+		fwrite($fp, $debug_string);
+	}
 	//wpgplus_logout(); //optional - log out
 	return true;
 }
@@ -49,11 +54,6 @@ function wpgplus_login_data() {
 		$wpgplusOptions[$key] = $option;
 	}
 	$wpgplus_debug_file= WP_PLUGIN_DIR .'/wpgplus/debug.txt';
-	$fp = @fopen($wpgplus_debug_file, 'a');
-	//$debug_string=date("Y-m-d H:i:s",time())." : wgplus_safe_post_google running, username is ". $wpgplusOptions['wpgplus_username'] ."\n";
-	//$debug_string .= "password is " .$wpgplusOptions['wpgplus_password'] . "\n";
-	fwrite($fp, $debug_string);	
-	
 	$ch = curl_init();
     curl_setopt($ch, CURLOPT_COOKIEJAR,WP_PLUGIN_DIR .'/wpgplus/cookies.txt');
     curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/4.0 (compatible; MSIE 5.0; S60/3.0 NokiaN73-1/2.0(2.0617.0.0.7) Profile/MIDP-2.0 Configuration/CLDC-1.1)');
@@ -65,7 +65,9 @@ function wpgplus_login_data() {
 	$fp = @fopen($wpgplus_debug_file, 'a');
 	$debug_string=date("Y-m-d H:i:s",time())." : just requested the login info\n";
 	$debug_string .= "\nBuffer is\n" . $buf . "\n";
-	fwrite($fp, $debug_string);	
+	if($fp) {
+		fwrite($fp, $debug_string);	
+	}
     curl_close($ch);
 
     $toreturn = '';
@@ -102,7 +104,9 @@ function wpgplus_login($postdata) {
 	$debug_string=date("Y-m-d H:i:s",time())." : login data posted\n";
 	$debug_string .= date("Y-m-d H:i:s",time())." : status code was ". curl_getinfo($ch, CURLINFO_HTTP_CODE) ."\n";
 	$debug_string .= "\n buffer was \n" . $buf ."\n";
-	fwrite($fp, $debug_string);
+	if($fp) {
+		fwrite($fp, $debug_string);
+	}
 	curl_close($ch);
 
 	/* for some reason, for some users - $postdata[1] still is not right at this
@@ -130,7 +134,9 @@ function wpgplus_login($postdata) {
 	}
 	
 	$fp = @fopen($wpgplus_debug_file, 'a');
-	fwrite($fp, $debug_string); 
+	if($fp) {
+		fwrite($fp, $debug_string);
+	}
 }
 
 function wpgplus_update_profile_status($post_id) {
@@ -140,17 +146,23 @@ function wpgplus_update_profile_status($post_id) {
 	$my_post = get_post($post_id); 
 	$fp = @fopen($wpgplus_debug_file, 'a');
 	$debug_string=date("Y-m-d H:i:s",time())." : Inside update_profile_states with post_id ". $post_id ." \n";
-	fwrite($fp, $debug_string);
+	if($fp) {
+		fwrite($fp, $debug_string);
+	}
 	if(!empty($my_post->post_password)) { // post is password protected, don't post
 		$fp = @fopen($wpgplus_debug_file, 'a');
 		$debug_string=date("Y-m-d H:i:s",time())." : Post is password protected\n";
-		fwrite($fp, $debug_string);
+		if($fp) {
+			fwrite($fp, $debug_string);
+		}
 		return;
 	}
 	if(get_post_type($my_post->ID) != 'post') { // only do this for posts
 		$fp = @fopen($wpgplus_debug_file, 'a');
 		$debug_string=date("Y-m-d H:i:s",time())." : Post type is ". get_post_type($my_post->ID) ."\n";
-		fwrite($fp, $debug_string);
+		if($fp) {
+			fwrite($fp, $debug_string);
+		}
 		return;
 	}
 	$my_post_text = get_post_meta($post_id,'wpgplus_message',true);  // if we have a post_message
@@ -171,8 +183,10 @@ function wpgplus_update_profile_status($post_id) {
 	$fp = @fopen($wpgplus_debug_file, 'a');
 	$debug_string=date("Y-m-d H:i:s",time())." : Getting form for posting\n";
 	$debug_string .= date("Y-m-d H:i:s",time())." : Post text is ". $my_post_text ."\n";
-	fwrite($fp, $debug_string);
-
+	if($fp) {
+		fwrite($fp, $debug_string);
+	}
+	
 	$ch = curl_init();
     curl_setopt($ch, CURLOPT_COOKIEJAR, WP_PLUGIN_DIR .'/wpgplus/cookies.txt');
     curl_setopt($ch, CURLOPT_COOKIEFILE, WP_PLUGIN_DIR .'/wpgplus/cookies.txt');
@@ -185,7 +199,9 @@ function wpgplus_update_profile_status($post_id) {
 	$fp = @fopen($wpgplus_debug_file, 'a');
 	$debug_string=date("Y-m-d H:i:s",time())." : Got form, status was ". curl_getinfo($ch, CURLINFO_HTTP_CODE) . "\n";
 	$debug_string .= date("Y-m-d H:i:s",time())." : Response was:\n". $buf ."\n\n";
-	fwrite($fp, $debug_string);
+	if($fp) {
+		fwrite($fp, $debug_string);
+	}
     curl_close($ch);
     
     $params = '';
@@ -205,8 +221,9 @@ function wpgplus_update_profile_status($post_id) {
 	$fp = @fopen($wpgplus_debug_file, 'a');
 	$debug_string=date("Y-m-d H:i:s",time())." : Going to publish, params is ". $params ."\n";
 	$debug_string=date("Y-m-d H:i:s",time())." : and base url is ". $baseurl ."\n";
-	fwrite($fp, $debug_string);
-	
+	if($fp) {
+		fwrite($fp, $debug_string);
+	}
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_COOKIEJAR, WP_PLUGIN_DIR .'/wpgplus/cookies.txt');
     curl_setopt($ch, CURLOPT_COOKIEFILE, WP_PLUGIN_DIR .'/wpgplus/cookies.txt');
@@ -226,7 +243,9 @@ function wpgplus_update_profile_status($post_id) {
 	$debug_string .= date("Y-m-d H:i:s",time())." : Header of response was ". $header ."\n";
 	$debug_string .= date("Y-m-d H:i:s",time())." : Body was ". $buf ."\n";
 	
-	fwrite($fp, $debug_string);
+	if($fp) {
+		fwrite($fp, $debug_string);
+	}
     curl_close($ch);
 }
 

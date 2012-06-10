@@ -137,7 +137,9 @@ function wpgplus_publish_to_gplus($post) {
 		include_once(WP_PLUGIN_DIR .'/wpgplus/gplus.php');
 		$fp = @fopen($wpgplus_debug_file, 'a');
 		$debug_string=date("Y-m-d H:i:s",time())." : publish_to_gplus running, included wpgplus.php\n";
-		fwrite($fp, $debug_string);
+		if($fp) {
+			fwrite($fp, $debug_string);
+		} 
 	} else {
 		wp_die("Sorry, but you can't run this plugin, it requires PHP 5 or higher.");
 	}	
@@ -145,20 +147,25 @@ function wpgplus_publish_to_gplus($post) {
 	if(($publish_meta == 'no')) { // user chose not to post this one
 		$fp = @fopen($wpgplus_debug_file, 'a');
 		$debug_string=date("Y-m-d H:i:s",time())." : Post_meta was set to not publish, postID is " . $my_post_id ."\n";
-		fwrite($fp, $debug_string);
+		if($fp) {
+			fwrite($fp, $debug_string);
+		}
 		return;
 	}
 	$my_post_id = $post->ID;
 	$fp = @fopen($wpgplus_debug_file, 'a');
 	$debug_string=date("Y-m-d H:i:s",time())." : publish_to_gplus running, postID is " . $my_post_id ."\n";
-	fwrite($fp, $debug_string);
+	if($fp) {
+		fwrite($fp, $debug_string);
+	}
 	if($my_post_id && ($my_post_id != '')) {
 		wpgplus_safe_post_google($my_post_id);
 	}
 	$fp = @fopen($wpgplus_debug_file, 'a');
 	$debug_string=date("Y-m-d H:i:s",time())." : publish_to_gplus done running\n";
-	fwrite($fp, $debug_string);
-	
+	if($fp) {
+		fwrite($fp, $debug_string);
+	}
 	
 } // end of function wpgplus_publish_to_gplus
   
