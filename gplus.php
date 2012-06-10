@@ -63,7 +63,7 @@ function wpgplus_login_data() {
     curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
     $buf = utf8_decode(html_entity_decode(curl_exec($ch)));
 	$fp = @fopen($wpgplus_debug_file, 'a');
-	$debug_string=date("Y-m-d H:i:s",time())." : just posted the login info\n";
+	$debug_string=date("Y-m-d H:i:s",time())." : just requested the login info\n";
 	$debug_string .= "\nBuffer is\n" . $buf . "\n";
 	fwrite($fp, $debug_string);	
     curl_close($ch);
@@ -86,7 +86,8 @@ function wpgplus_login_data() {
 // POST login: https://accounts.google.com/ServiceLoginAuth
 function wpgplus_login($postdata) {
 	$wpgplus_debug_file= WP_PLUGIN_DIR .'/wpgplus/debug.txt';
-    $ch = curl_init();
+	$debug_string = "\n[+] POSTing username and pass to: " . $postdata[1] . "\n\n";
+	$ch = curl_init();
     curl_setopt($ch, CURLOPT_COOKIEJAR, WP_PLUGIN_DIR .'/wpgplus/cookies.txt');
     curl_setopt($ch, CURLOPT_COOKIEFILE, WP_PLUGIN_DIR .'/wpgplus/cookies.txt');
     curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/4.0 (compatible; MSIE 5.0; S60/3.0 NokiaN73-1/2.0(2.0617.0.0.7) Profile/MIDP-2.0 Configuration/CLDC-1.1)');
@@ -95,18 +96,40 @@ function wpgplus_login($postdata) {
     curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
     curl_setopt($ch, CURLOPT_POST, 1);
     curl_setopt($ch, CURLOPT_POSTFIELDS, $postdata[0]);
-    $buf = curl_exec($ch); #this is not the g+ home page, because the b**** doesn't redirect properly
+    $buf = curl_exec($ch); 
     
 	$fp = @fopen($wpgplus_debug_file, 'a');
 	$debug_string=date("Y-m-d H:i:s",time())." : login data posted\n";
 	$debug_string .= date("Y-m-d H:i:s",time())." : status code was ". curl_getinfo($ch, CURLINFO_HTTP_CODE) ."\n";
 	$debug_string .= "\n buffer was \n" . $buf ."\n";
 	fwrite($fp, $debug_string);
-	
 	curl_close($ch);
 
+	/* for some reason, for some users - $postdata[1] still is not right at this
+	 * point and instead buffer retruned includes a client-side redirect 
+	 */ 
+	if(substr(buf,'meta http-equiv="refresh"') === FALSE) {
+		$debug_string = "\n[+] Response did NOT include meta http-equiv=refresh \n\n";
+	} else {
+		$params = '';
+		$doc = new DOMDocument;
+		@$doc->loadHTML($buf); 
+		$metas = $doc->getElementsByTagName('a');
+		$new_url = $metas->item(1)->getAttribute('href');  //only one link? 
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_COOKIEJAR, WP_PLUGIN_DIR .'/wpgplus/cookies.txt');
+		curl_setopt($ch, CURLOPT_COOKIEFILE, WP_PLUGIN_DIR .'/wpgplus/cookies.txt');
+		curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/4.0 (compatible; MSIE 5.0; S60/3.0 NokiaN73-1/2.0(2.0617.0.0.7) Profile/MIDP-2.0 Configuration/CLDC-1.1)');
+		curl_setopt($ch, CURLOPT_URL, $new_url);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+		$buf = curl_exec($ch);
+		$debug_string = "\n[+] Response included redirect. \n";
+		$debug_string .= "\n Post-redirect buffer was \n" . $buf ."\n";
+		curl_close($ch);
+	}
+	
 	$fp = @fopen($wpgplus_debug_file, 'a');
-	$debug_string = "\n[+] Sending POST request to: " . $postdata[1] . "\n\n";
 	fwrite($fp, $debug_string); 
 }
 
@@ -115,6 +138,9 @@ function wpgplus_update_profile_status($post_id) {
 	global $more; 
 	$more = 0; //only the post teaser please 
 	$my_post = get_post($post_id); 
+	$fp = @fopen($wpgplus_debug_file, 'a');
+	$debug_string=date("Y-m-d H:i:s",time())." : Inside update_profile_states with post_id ". $post_id ." \n";
+	fwrite($fp, $debug_string);
 	if(!empty($my_post->post_password)) { // post is password protected, don't post
 		$fp = @fopen($wpgplus_debug_file, 'a');
 		$debug_string=date("Y-m-d H:i:s",time())." : Post is password protected\n";

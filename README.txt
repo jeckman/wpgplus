@@ -1,8 +1,8 @@
 === WPGPlus ===
 Contributors: johneckman
 Tags: google plus, platform, application, blog
-Stable tag: 0.7.1
-Tested up to: 3.3
+Stable tag: 0.7.2
+Tested up to: 3.3.2
 Requires at least: 2.9
 
 WPGPlus posts your blog posts to Google+ when published on WordPress blog. 
@@ -39,6 +39,11 @@ publishing to Google+ from php.
 
 
 == Changelog ==
+
+= 0.7.2 = 
+* Adding further detection for cases where Google+ returns a client-side
+  redirect in response to a login request, rather than returning the right form
+
 
 = 0.7.1 =
 * Fixed bug in which message and publish meta were being duplicated

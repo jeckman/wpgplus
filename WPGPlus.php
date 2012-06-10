@@ -143,6 +143,9 @@ function wpgplus_publish_to_gplus($post) {
 	}	
 	$publish_meta = get_post_meta($post->ID,'wpgplus_publish',true); 
 	if(($publish_meta == 'no')) { // user chose not to post this one
+		$fp = @fopen($wpgplus_debug_file, 'a');
+		$debug_string=date("Y-m-d H:i:s",time())." : Post_meta was set to not publish, postID is " . $my_post_id ."\n";
+		fwrite($fp, $debug_string);
 		return;
 	}
 	$my_post_id = $post->ID;
