@@ -1,7 +1,7 @@
 === WPGPlus ===
 Contributors: johneckman
 Tags: google plus, platform, application, blog
-Stable tag: 0.7.2
+Stable tag: 0.7.3
 Tested up to: 3.3.2
 Requires at least: 2.9
 
@@ -40,6 +40,7 @@ publishing to Google+ from php.
 
 == Changelog ==
 
+= 0.7.3 = 
 * Checked for login form being presented by google else it will fail
 * Wrapped calls to curl_setopt() for FOLLOWLOCATION - now checks to see if that
   setting was successful and dies if it was not. 
