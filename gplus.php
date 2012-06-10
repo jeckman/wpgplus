@@ -24,10 +24,21 @@ function wpgplus_safe_post_google($post_id) {
 	if($fp) {
 		fwrite($fp, $debug_string);
 	}
-	
 	@unlink(WP_PLUGIN_DIR .'/wpgplus/cookies.txt'); //delete previous cookie file if exists
-	touch(WP_PLUGIN_DIR .'/wpgplus/cookies.txt'); //create a cookie file
-
+	if(touch(WP_PLUGIN_DIR .'/wpgplus/cookies.txt')) {
+		$fp = @fopen($wpgplus_debug_file, 'a');
+		$debug_string=date("Y-m-d H:i:s",time())." : touched cookie file\n";
+		if($fp) {
+			fwrite($fp, $debug_string);
+		}
+	} else {
+		$fp = @fopen($wpgplus_debug_file, 'a');
+		$debug_string=date("Y-m-d H:i:s",time())." : Could not create cookie file\n";
+		if($fp) {
+			fwrite($fp, $debug_string);
+		}
+		wp_die('WPGPlus could not create necessary cookie file'); 
+	}
 	wpgplus_login(wpgplus_login_data());
 	$fp = @fopen($wpgplus_debug_file, 'a');
 	$debug_string=date("Y-m-d H:i:s",time())." : wgplus_safe_post_google running,  past log in\n";
@@ -60,7 +71,15 @@ function wpgplus_login_data() {
     curl_setopt($ch, CURLOPT_URL, "https://plus.google.com/");
     curl_setopt($ch, CURLOPT_COOKIEFILE, WP_PLUGIN_DIR .'/wpgplus/cookies.txt');
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+    if(!(curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1))) {
+		$fp = @fopen($wpgplus_debug_file, 'a');
+		$debug_string=date("Y-m-d H:i:s",time())." : WPGPlus could NOT set CURLOPT_FOLLOWLOCATION\n";
+		$debug_string .= "\nThis must be enabled for WPGPlus to work. Ask your hosting provider.\n";
+		if($fp) {
+			fwrite($fp, $debug_string);	
+		}	
+		wp_die('WPGPlus could not set required curl option for follow redirects'); 
+	}
     $buf = utf8_decode(html_entity_decode(curl_exec($ch)));
 	$fp = @fopen($wpgplus_debug_file, 'a');
 	$debug_string=date("Y-m-d H:i:s",time())." : just requested the login info\n";
@@ -82,7 +101,18 @@ function wpgplus_login_data() {
 		}
     }
     // return array (string postdata, string postaction)
-    return array(wpgplus_tidy($toreturn), $doc->getElementsByTagName('form')->item(0)->getAttribute('action'));
+	$my_form = $doc->getElementsByTagName('form');
+	if($my_form) {
+		$my_action_url = $my_form->item(0)->getAttribute('action');	
+		return array(wpgplus_tidy($toreturn), $doc->getElementsByTagName('form')->item(0)->getAttribute('action'));
+	} else {
+		$fp = @fopen($wpgplus_debug_file, 'a');
+		$debug_string=date("Y-m-d H:i:s",time())." : Did not get a form to post login to\n";
+		if($fp) {
+			fwrite($fp, $debug_string);	
+		}
+		wp_die('WPGPlus did not get a form in the response from google+'); 
+	}	
 }
 
 // POST login: https://accounts.google.com/ServiceLoginAuth
@@ -95,7 +125,15 @@ function wpgplus_login($postdata) {
     curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/4.0 (compatible; MSIE 5.0; S60/3.0 NokiaN73-1/2.0(2.0617.0.0.7) Profile/MIDP-2.0 Configuration/CLDC-1.1)');
     curl_setopt($ch, CURLOPT_URL, $postdata[1]);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+	if(!(curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1))) {
+		$fp = @fopen($wpgplus_debug_file, 'a');
+		$debug_string=date("Y-m-d H:i:s",time())." : WPGPlus could NOT set CURLOPT_FOLLOWLOCATION\n";
+		$debug_string .= "\nThis must be enabled for WPGPlus to work. Ask your hosting provider.\n";
+		if($fp) {
+			fwrite($fp, $debug_string);	
+		}	
+		wp_die('WPGPlus could not set required curl option for follow redirects'); 
+	};
     curl_setopt($ch, CURLOPT_POST, 1);
     curl_setopt($ch, CURLOPT_POSTFIELDS, $postdata[0]);
     $buf = curl_exec($ch); 
@@ -126,7 +164,15 @@ function wpgplus_login($postdata) {
 		curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/4.0 (compatible; MSIE 5.0; S60/3.0 NokiaN73-1/2.0(2.0617.0.0.7) Profile/MIDP-2.0 Configuration/CLDC-1.1)');
 		curl_setopt($ch, CURLOPT_URL, $new_url);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+		if(!(curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1))) {
+			$fp = @fopen($wpgplus_debug_file, 'a');
+			$debug_string=date("Y-m-d H:i:s",time())." : WPGPlus could NOT set CURLOPT_FOLLOWLOCATION\n";
+			$debug_string .= "\nThis must be enabled for WPGPlus to work. Ask your hosting provider.\n";
+			if($fp) {
+				fwrite($fp, $debug_string);	
+			}	
+			wp_die('WPGPlus could not set required curl option for follow redirects'); 
+		};
 		$buf = curl_exec($ch);
 		$debug_string = "\n[+] Response included redirect. \n";
 		$debug_string .= "\n Post-redirect buffer was \n" . $buf ."\n";
@@ -193,7 +239,15 @@ function wpgplus_update_profile_status($post_id) {
     curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/4.0 (compatible; MSIE 5.0; S60/3.0 NokiaN73-1/2.0(2.0617.0.0.7) Profile/MIDP-2.0 Configuration/CLDC-1.1)');
     curl_setopt($ch, CURLOPT_URL, 'https://m.google.com/app/plus/?v=compose&group=m1c&hideloc=1');
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+    if(!(curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1))) {
+		$fp = @fopen($wpgplus_debug_file, 'a');
+		$debug_string=date("Y-m-d H:i:s",time())." : WPGPlus could NOT set CURLOPT_FOLLOWLOCATION\n";
+		$debug_string .= "\nThis must be enabled for WPGPlus to work. Ask your hosting provider.\n";
+		if($fp) {
+			fwrite($fp, $debug_string);	
+		}	
+		wp_die('WPGPlus could not set required curl option for follow redirects'); 
+	};
     $buf = utf8_decode(html_entity_decode(str_replace('&', '', curl_exec($ch))));
     $header = curl_getinfo($ch);
 	$fp = @fopen($wpgplus_debug_file, 'a');
@@ -231,7 +285,15 @@ function wpgplus_update_profile_status($post_id) {
 	/* group=m1c is 'your circles', group=b0 is 'public' */ 
     curl_setopt($ch, CURLOPT_URL, $baseurl . '?v=compose&group=m1c&group=b0&hideloc=1&a=post');
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+    if(!(curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1))) {
+		$fp = @fopen($wpgplus_debug_file, 'a');
+		$debug_string=date("Y-m-d H:i:s",time())." : WPGPlus could NOT set CURLOPT_FOLLOWLOCATION\n";
+		$debug_string .= "\nThis must be enabled for WPGPlus to work. Ask your hosting provider.\n";
+		if($fp) {
+			fwrite($fp, $debug_string);	
+		}	
+		wp_die('WPGPlus could not set required curl option for follow redirects'); 
+	};
     curl_setopt($ch, CURLOPT_REFERER, $baseurl . '?v=compose&group=m1c&group=b0&hideloc=1');
     curl_setopt($ch, CURLOPT_POST, 1);
     curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
@@ -256,7 +318,15 @@ function wpgplus_logout() {
     curl_setopt($ch, CURLOPT_COOKIEJAR, WP_PLUGIN_DIR .'/wpgplus/cookies.txt');
     curl_setopt($ch, CURLOPT_COOKIEFILE, WP_PLUGIN_DIR .'/wpgplus/cookies.txt');
     curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/4.0 (compatible; MSIE 5.0; S60/3.0 NokiaN73-1/2.0(2.0617.0.0.7) Profile/MIDP-2.0 Configuration/CLDC-1.1)');
-    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+    if(!(curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1))) {
+		$fp = @fopen($wpgplus_debug_file, 'a');
+		$debug_string=date("Y-m-d H:i:s",time())." : WPGPlus could NOT set CURLOPT_FOLLOWLOCATION\n";
+		$debug_string .= "\nThis must be enabled for WPGPlus to work. Ask your hosting provider.\n";
+		if($fp) {
+			fwrite($fp, $debug_string);	
+		}	
+		wp_die('WPGPlus could not set required curl option for follow redirects'); 
+	};
     curl_setopt($ch, CURLOPT_URL, 'https://www.google.com/m/logout');
     $buf = curl_exec	($ch);
     curl_close($ch);

@@ -40,6 +40,11 @@ publishing to Google+ from php.
 
 == Changelog ==
 
+* Checked for login form being presented by google else it will fail
+* Wrapped calls to curl_setopt() for FOLLOWLOCATION - now checks to see if that
+  setting was successful and dies if it was not. 
+* Wrapped fwrite calls for debug.txt in checks for valid file pointer first.
+
 = 0.7.2 = 
 * Adding further detection for cases where Google+ returns a client-side
   redirect in response to a login request, rather than returning the right form
