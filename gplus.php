@@ -126,7 +126,7 @@ function wpgplus_login($postdata) {
 	
 	$my_args = array('method' => 'POST',
 					 'timeout' => '45',
-					 'redirection' => '5',
+					 'redirection' => '10',
 					 'user-agent' => 'Mozilla/4.0 (compatible; MSIE 5.0; S60/3.0 NokiaN73-1/2.0(2.0617.0.0.7) Profile/MIDP-2.0 Configuration/CLDC-1.1)',
 					 'blocking' => true,
 					 'compress' => false,
@@ -136,13 +136,27 @@ function wpgplus_login($postdata) {
 					 'cookies' => $cookies,
 					);					    
 	$buf = wp_remote_post($postdata[1],$my_args);     
+	
+/* POST to https://accounts.google.com/ServiceLoginAuth
+ *   = 302 redirect to https://accounts.google.com/CheckCookie
+ * GET to https://accounts.google.com/CheckCookie
+ *   = 302 redirect to https://plus.google.com/app/plus/x/?login
+ * GET to https://plus.google.com/app/plus/x/?login
+ *   = 302 redirect to https://plus.google.com/app/plus/x/?login=1
+ * GET to https://plus.google.com/app/plus/x/?login=1
+ *   = 302 redirect to https://plus.google.com/app/plus/x/#/?login=1
+ * GET to https://plus.google.com/app/plus/x/#/?login=1
+ *   = 302 redirect to https://plus.google.com/app/plus/x/?v=stream
+ * GET to https://plus.google.com/app/plus/x/?v=stream
+ *   = 302 redirect to https://plus.google.com/app/plus/x/code/?v=stream
+ * GET of that is an ok. 
+ * In order to avoid use of cURL here we'll need to map each of these with all 
+   cookies each time. @#@!
+ */    
 	$fp = @fopen($wpgplus_debug_file, 'a');
 	$debug_string .=date("Y-m-d H:i:s",time())." : login data posted\n";
 	$debug_string .= "\n cookies were \n" . print_r($cookies,true) ."\n";
 	$debug_string .= "\n Postdata was \n" . print_r($postdata[0],true) ."\n";
-
-
-	//$debug_string .= date("Y-m-d H:i:s",time())." : status code was ". curl_getinfo($ch, CURLINFO_HTTP_CODE) ."\n";
 	$debug_string .= "\n Response from Google was \n" . print_r($buf['body'],true) ."\n";
 	if($fp) {
 		fwrite($fp, $debug_string);
