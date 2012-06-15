@@ -13,7 +13,7 @@
 // Vladimir Smirnoff http://orl.sumy.ua mail@smirnoff.sumy.ua
 // Kichrum http://Kichrum.org.ua
 
-// (!) Works only with Google 2-step auth turned off
+// (!) Works only with Google 2-step auth turned off AND mobile terms of service accepted
 
 $wpgplus_debug_file= WP_PLUGIN_DIR .'/wpgplus/debug.txt';
 
@@ -24,30 +24,15 @@ function wpgplus_safe_post_google($post_id) {
 	if($fp) {
 		fwrite($fp, $debug_string);
 	}
-	@unlink(WP_PLUGIN_DIR .'/wpgplus/cookies.txt'); //delete previous cookie file if exists
-	if(touch(WP_PLUGIN_DIR .'/wpgplus/cookies.txt')) {
-		$fp = @fopen($wpgplus_debug_file, 'a');
-		$debug_string=date("Y-m-d H:i:s",time())." : touched cookie file\n";
-		if($fp) {
-			fwrite($fp, $debug_string);
-		}
-	} else {
-		$fp = @fopen($wpgplus_debug_file, 'a');
-		$debug_string=date("Y-m-d H:i:s",time())." : Could not create cookie file\n";
-		if($fp) {
-			fwrite($fp, $debug_string);
-		}
-		wp_die('WPGPlus could not create necessary cookie file'); 
-	}
 	wpgplus_login(wpgplus_login_data());
 	$fp = @fopen($wpgplus_debug_file, 'a');
 	$debug_string=date("Y-m-d H:i:s",time())." : wgplus_safe_post_google running,  past log in\n";
 	if($fp) {
 		fwrite($fp, $debug_string);
 	}
-	sleep(5);
-	wpgplus_update_profile_status($post_id);
-	sleep(5);
+	//sleep(5);
+	//wpgplus_update_profile_status($post_id);
+	//sleep(5);
 	$fp = @fopen($wpgplus_debug_file, 'a');
 	$debug_string=date("Y-m-d H:i:s",time())." : wgplus_safe_post_google running,  past update\n";
 	if($fp) {
@@ -65,33 +50,35 @@ function wpgplus_login_data() {
 		$wpgplusOptions[$key] = $option;
 	}
 	$wpgplus_debug_file= WP_PLUGIN_DIR .'/wpgplus/debug.txt';
-	$ch = curl_init();
-    curl_setopt($ch, CURLOPT_COOKIEJAR,WP_PLUGIN_DIR .'/wpgplus/cookies.txt');
-    curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/4.0 (compatible; MSIE 5.0; S60/3.0 NokiaN73-1/2.0(2.0617.0.0.7) Profile/MIDP-2.0 Configuration/CLDC-1.1)');
-    curl_setopt($ch, CURLOPT_URL, "https://plus.google.com/");
-    curl_setopt($ch, CURLOPT_COOKIEFILE, WP_PLUGIN_DIR .'/wpgplus/cookies.txt');
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-    if(!(curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1))) {
-		$fp = @fopen($wpgplus_debug_file, 'a');
-		$debug_string=date("Y-m-d H:i:s",time())." : WPGPlus could NOT set CURLOPT_FOLLOWLOCATION\n";
-		$debug_string .= "\nThis must be enabled for WPGPlus to work. Ask your hosting provider.\n";
-		if($fp) {
-			fwrite($fp, $debug_string);	
-		}	
-		wp_die('WPGPlus could not set required curl option for follow redirects'); 
-	}
-    $buf = utf8_decode(html_entity_decode(curl_exec($ch)));
+	$my_args = array('method' => 'GET',
+					 'timeout' => '5',
+					 'redirection' => '5',
+					 'user-agent' => 'Mozilla/4.0 (compatible; MSIE 5.0; S60/3.0 NokiaN73-1/2.0(2.0617.0.0.7) Profile/MIDP-2.0 Configuration/CLDC-1.1)',
+					 'blocking' => true,
+					 'compress' => false,
+					 'decompress' => true,
+					 'ssl-verify' => false
+					);
+	$buf = wp_remote_get('https://plus.google.com/',$my_args);
 	$fp = @fopen($wpgplus_debug_file, 'a');
 	$debug_string=date("Y-m-d H:i:s",time())." : just requested the login info\n";
-	$debug_string .= "\nBuffer is\n" . $buf . "\n";
+	$debug_string .= "\nBuffer is\n". print_r($buf,true) . "\n";
+	$my_cookie = $buf['cookies'][0]->value; // this is a WP_Http_cookie object
+	$my_cookie2 = $buf['cookies'][1]->value; 
+	set_transient('wpgplus_cookies',$my_cookie,60*60); // set for 1 hr
+	set_transient('wpgplus_expires',$buf['cookies'][0]->expires,60*60);
+	set_transient('wpgplus_cookie2',$my_cookie2,60*60); 
+	$debug_string .= "\nCookie was ". $my_cookie . "\n";
+	$debug_string .= "\nCookie2 was ". $my_cookie2 . "\n";
+
+
 	if($fp) {
 		fwrite($fp, $debug_string);	
 	}
-    curl_close($ch);
-
+	
     $toreturn = '';
     $doc = new DOMDocument;
-    @$doc->loadHTML($buf);
+    @$doc->loadHTML($buf['body']);
     $inputs = $doc->getElementsByTagName('input');
     foreach ($inputs as $input) {
 		switch ($input->getAttribute('name')) {
@@ -119,67 +106,44 @@ function wpgplus_login_data() {
 function wpgplus_login($postdata) {
 	$wpgplus_debug_file= WP_PLUGIN_DIR .'/wpgplus/debug.txt';
 	$debug_string = "\n[+] POSTing username and pass to: " . $postdata[1] . "\n\n";
-	$ch = curl_init();
-    curl_setopt($ch, CURLOPT_COOKIEJAR, WP_PLUGIN_DIR .'/wpgplus/cookies.txt');
-    curl_setopt($ch, CURLOPT_COOKIEFILE, WP_PLUGIN_DIR .'/wpgplus/cookies.txt');
-    curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/4.0 (compatible; MSIE 5.0; S60/3.0 NokiaN73-1/2.0(2.0617.0.0.7) Profile/MIDP-2.0 Configuration/CLDC-1.1)');
-    curl_setopt($ch, CURLOPT_URL, $postdata[1]);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-	if(!(curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1))) {
-		$fp = @fopen($wpgplus_debug_file, 'a');
-		$debug_string=date("Y-m-d H:i:s",time())." : WPGPlus could NOT set CURLOPT_FOLLOWLOCATION\n";
-		$debug_string .= "\nThis must be enabled for WPGPlus to work. Ask your hosting provider.\n";
-		if($fp) {
-			fwrite($fp, $debug_string);	
-		}	
-		wp_die('WPGPlus could not set required curl option for follow redirects'); 
-	};
-    curl_setopt($ch, CURLOPT_POST, 1);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, $postdata[0]);
-    $buf = curl_exec($ch); 
-    
-	$fp = @fopen($wpgplus_debug_file, 'a');
-	$debug_string=date("Y-m-d H:i:s",time())." : login data posted\n";
-	$debug_string .= date("Y-m-d H:i:s",time())." : status code was ". curl_getinfo($ch, CURLINFO_HTTP_CODE) ."\n";
-	$debug_string .= "\n buffer was \n" . $buf ."\n";
-	if($fp) {
-		fwrite($fp, $debug_string);
-	}
-	curl_close($ch);
-
-	/* for some reason, for some users - $postdata[1] still is not right at this
-	 * point and instead buffer retruned includes a client-side redirect 
-	 */ 
-	if(substr(buf,'meta http-equiv="refresh"') === FALSE) {
-		$debug_string = "\n[+] Response did NOT include meta http-equiv=refresh \n\n";
-	} else {
-		$params = '';
-		$doc = new DOMDocument;
-		@$doc->loadHTML($buf); 
-		$metas = $doc->getElementsByTagName('a');
-		$new_url = $metas->item(1)->getAttribute('href');  //only one link? 
-		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_COOKIEJAR, WP_PLUGIN_DIR .'/wpgplus/cookies.txt');
-		curl_setopt($ch, CURLOPT_COOKIEFILE, WP_PLUGIN_DIR .'/wpgplus/cookies.txt');
-		curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/4.0 (compatible; MSIE 5.0; S60/3.0 NokiaN73-1/2.0(2.0617.0.0.7) Profile/MIDP-2.0 Configuration/CLDC-1.1)');
-		curl_setopt($ch, CURLOPT_URL, $new_url);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		if(!(curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1))) {
-			$fp = @fopen($wpgplus_debug_file, 'a');
-			$debug_string=date("Y-m-d H:i:s",time())." : WPGPlus could NOT set CURLOPT_FOLLOWLOCATION\n";
-			$debug_string .= "\nThis must be enabled for WPGPlus to work. Ask your hosting provider.\n";
-			if($fp) {
-				fwrite($fp, $debug_string);	
-			}	
-			wp_die('WPGPlus could not set required curl option for follow redirects'); 
-		};
-		$buf = curl_exec($ch);
-		$debug_string = "\n[+] Response included redirect. \n";
-		$debug_string .= "\n Post-redirect buffer was \n" . $buf ."\n";
-		curl_close($ch);
-	}
+	$my_cookie = new WP_Http_Cookie('GAPS');  // recreate cookie object
+	$my_cookie->name = 'GAPS';
+	$my_cookie->value = get_transient('wpgplus_cookies');
+	$my_cookie->expires = get_transient('wpgplus_expires');
+	$my_cookie->path = '/';
+	$my_cookie->domain = '';
+	$my_cookie->secure = '';
+	$my_cookie->httponly = '';
+	$cookies[] = $my_cookie; 	
+	$my_cookie2 = new WP_Http_Cookie('GALX');  // recreate cookie object
+	$my_cookie2->name = 'GALX';
+	$my_cookie2->value = get_transient('wpgplus_cookie2');
+	$my_cookie2->expires = '';
+	$my_cookie2->path = '/';
+	$my_cookie2->domain = '';
+	$my_cookie2->secure = '';
+	$cookies[] = $my_cookie2; 	
 	
+	$my_args = array('method' => 'POST',
+					 'timeout' => '45',
+					 'redirection' => '5',
+					 'user-agent' => 'Mozilla/4.0 (compatible; MSIE 5.0; S60/3.0 NokiaN73-1/2.0(2.0617.0.0.7) Profile/MIDP-2.0 Configuration/CLDC-1.1)',
+					 'blocking' => true,
+					 'compress' => false,
+					 'decompress' => true,
+					 'ssl-verify' => false,
+					 'body' => $postdata[0],
+					 'cookies' => $cookies,
+					);					    
+	$buf = wp_remote_post($postdata[1],$my_args);     
 	$fp = @fopen($wpgplus_debug_file, 'a');
+	$debug_string .=date("Y-m-d H:i:s",time())." : login data posted\n";
+	$debug_string .= "\n cookies were \n" . print_r($cookies,true) ."\n";
+	$debug_string .= "\n Postdata was \n" . print_r($postdata[0],true) ."\n";
+
+
+	//$debug_string .= date("Y-m-d H:i:s",time())." : status code was ". curl_getinfo($ch, CURLINFO_HTTP_CODE) ."\n";
+	$debug_string .= "\n Response from Google was \n" . print_r($buf['body'],true) ."\n";
 	if($fp) {
 		fwrite($fp, $debug_string);
 	}
