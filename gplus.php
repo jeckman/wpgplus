@@ -3,9 +3,7 @@
  * J. Eckman - editing for use with WPBOok
  */
 
-// Based on:
-//   Dmitry Sandalov
-//   Twitter 2 Google Plus CrossPost PHP script
+// Based on: Dmitry Sandalov's Twitter 2 Google Plus CrossPost PHP script
 // Credits for original script: 
 // Luka Pusic luka@pusic.si
 // Vladimir Smirnoff http://orl.sumy.ua mail@smirnoff.sumy.ua
@@ -18,7 +16,7 @@ function wpgplus_safe_post_google($post_id) {
 	wpgplus_login(wpgplus_login_data());
 	wpgplus_debug(date("Y-m-d H:i:s",time())." : wgplus_safe_post_google running,  past log in\n");
 	//sleep(5);
-	//wpgplus_update_profile_status($post_id);
+	wpgplus_update_profile_status($post_id);
 	//sleep(5);
 	wpgplus_debug(date("Y-m-d H:i:s",time())." : wgplus_safe_post_google running,  past update\n");
 	//wpgplus_logout(); //optional - log out
@@ -43,7 +41,7 @@ function wpgplus_login_data() {
 					);
 	$buf = wp_remote_get('https://plus.google.com/',$my_args);
 	wpgplus_debug(date("Y-m-d H:i:s",time())." : just requested the login info\n");
-	wpgplus_debug("\nBuffer is\n". print_r($buf,true) . "\n");
+	//wpgplus_debug("\nBuffer is\n". print_r($buf,true) . "\n");
 	wpgplus_debug("\nWriting cookies from login get\n");
 	foreach($buf['cookies'] as $cookie) {
 		//wpgplus_debug("\nThis cookie is ". print_r($cookie,true) . "\n");
@@ -76,9 +74,13 @@ function wpgplus_login($postdata) {
 	wpgplus_debug("\nPOSTing username and pass to: " . $postdata[1] . "\n\n");
 	$cookies = array();
 	$my_cookie = wpgplus_get_cookie('GAPS');   // recreate cookie object
-	$cookies[] = $my_cookie; 	
+	if($my_cookie) {
+		$cookies[] = $my_cookie; 	
+	}
 	$my_cookie2 = wpgplus_get_cookie('GALX');  // recreate cookie object
-	$cookies[] = $my_cookie2; 		
+	if($my_cookie2) {
+		$cookies[] = $my_cookie2; 
+	}
 	$my_args = array('method' => 'POST',
 					 'timeout' => '45',
 					 'redirection' => 0,
@@ -95,12 +97,25 @@ function wpgplus_login($postdata) {
 	if(is_wp_error($buf)) {
 		wp_die($buf);
 	}
-	foreach($buf['cookies'] as $cookie) {
-		wpgplus_set_cookie($cookie->name,$cookie->value,60*60);
-		$cookies[] = $cookie;
+	// need to check to see what cookies are new or updated
+	// $new_cookies = array of cookies returned by post
+	// $cookies = array of existing cookies sent
+	$new_cookies = $buf['cookies'];
+	for($x = count($cookies); $x>0; $x--) {
+		// if cookie is already in $cookies array, we remove old version		
+		foreach($new_cookies as $new_cookie) {
+			if($new_cookie->name == $cookies[$x]->name) {
+				unset($cookies[$x]);
+			}
+		}		
+	}
+	// now that existing cookies are out of the array, add all back in
+	foreach($new_cookies as $cookie) {
+		wpgplus_set_cookie($cookie);
+		$cookies[] = $cookie; 
 	}
 	$my_redirect = $buf['headers']['location'];
-	wpgplus_debug("\nLine 105, My Redirect was ". $my_redirect ."\n");
+	wpgplus_debug("\nLine 114, My Redirect was ". $my_redirect ."\n");
 	$my_args = array('method' => 'GET',
 					 'timeout' => '45',
 					 'user-agent' => 'Mozilla/4.0 (compatible; MSIE 5.0; S60/3.0 NokiaN73-1/2.0(2.0617.0.0.7) Profile/MIDP-2.0 Configuration/CLDC-1.1)',
@@ -116,9 +131,22 @@ function wpgplus_login($postdata) {
 	if(is_wp_error($buf)) {
 		wp_die($buf);
 	}
-	foreach($buf['cookies'] as $cookie) {
-		wpgplus_set_cookie($cookie->name,$cookie->value,60*60);
-		$cookies[] = $cookie;
+	// need to check to see what cookies are new or updated
+	// $new_cookies = array of cookies returned by post
+	// $cookies = array of existing cookies sent
+	$new_cookies = $buf['cookies'];
+	for($x = count($cookies); $x>0; $x--) {
+		// if cookie is already in $cookies array, we remove old version		
+		foreach($new_cookies as $new_cookie) {
+			if($new_cookie->name == $cookies[$x]->name) {
+				unset($cookies[$x]);
+			}
+		}		
+	}
+	// now that existing cookies are out of the array, add all back in
+	foreach($new_cookies as $cookie) {
+		wpgplus_set_cookie($cookie);
+		$cookies[] = $cookie; 
 	}
 	$my_redirect = $buf['headers']['location'];
 	wpgplus_debug("\nLine 126, My Redirect was ". $my_redirect ."\n");
@@ -138,9 +166,22 @@ function wpgplus_login($postdata) {
 	if(is_wp_error($buf)) {
 		wp_die($buf);
 	}
-	foreach($buf['cookies'] as $cookie) {
-		wpgplus_set_cookie($cookie->name,$cookie->value,60*60);
-		$cookies[] = $cookie;
+	// need to check to see what cookies are new or updated
+	// $new_cookies = array of cookies returned by post
+	// $cookies = array of existing cookies sent
+	$new_cookies = $buf['cookies'];
+	for($x = count($cookies); $x>0; $x--) {
+		// if cookie is already in $cookies array, we remove old version		
+		foreach($new_cookies as $new_cookie) {
+			if($new_cookie->name == $cookies[$x]->name) {
+				unset($cookies[$x]);
+			}
+		}		
+	}
+	// now that existing cookies are out of the array, add all back in
+	foreach($new_cookies as $cookie) {
+		wpgplus_set_cookie($cookie);
+		$cookies[] = $cookie; 
 	}
 	$my_redirect = $buf['headers']['location'];
 	wpgplus_debug("\nLine 148, My Redirect was ". $my_redirect ."\n");
@@ -160,9 +201,22 @@ function wpgplus_login($postdata) {
 	if(is_wp_error($buf)) {
 		wp_die($buf);
 	}
-	foreach($buf['cookies'] as $cookie) {
-		wpgplus_set_cookie($cookie->name,$cookie->value,60*60);
-		$cookies[] = $cookie;
+	// need to check to see what cookies are new or updated
+	// $new_cookies = array of cookies returned by post
+	// $cookies = array of existing cookies sent
+	$new_cookies = $buf['cookies'];
+	for($x = count($cookies); $x>0; $x--) {
+		// if cookie is already in $cookies array, we remove old version		
+		foreach($new_cookies as $new_cookie) {
+			if($new_cookie->name == $cookies[$x]->name) {
+				unset($cookies[$x]);
+			}
+		}		
+	}
+	// now that existing cookies are out of the array, add all back in
+	foreach($new_cookies as $cookie) {
+		wpgplus_set_cookie($cookie);
+		$cookies[] = $cookie; 
 	}
 	$my_redirect = $buf['headers']['location'];
 	wpgplus_debug("\nLine 170, My Redirect was ". $my_redirect ."\n");
@@ -182,9 +236,22 @@ function wpgplus_login($postdata) {
 	if(is_wp_error($buf)) {
 		wp_die($buf);
 	}
-	foreach($buf['cookies'] as $cookie) {
-		wpgplus_set_cookie($cookie->name,$cookie->value,60*60);
-		$cookies[] = $cookie;
+	// need to check to see what cookies are new or updated
+	// $new_cookies = array of cookies returned by post
+	// $cookies = array of existing cookies sent
+	$new_cookies = $buf['cookies'];
+	for($x = count($cookies); $x>0; $x--) {
+		// if cookie is already in $cookies array, we remove old version		
+		foreach($new_cookies as $new_cookie) {
+			if($new_cookie->name == $cookies[$x]->name) {
+				unset($cookies[$x]);
+			}
+		}		
+	}
+	// now that existing cookies are out of the array, add all back in
+	foreach($new_cookies as $cookie) {
+		wpgplus_set_cookie($cookie);
+		$cookies[] = $cookie; 
 	}
 	$my_redirect = 'https://plus.google.com' . $buf['headers']['location']; // for some reason this time the url is relative
 	wpgplus_debug("\nLine 191, My Redirect was ". $my_redirect ."\n");
@@ -204,9 +271,22 @@ function wpgplus_login($postdata) {
 	if(is_wp_error($buf)) {
 		wp_die($buf);
 	}
-	foreach($buf['cookies'] as $cookie) {
-		wpgplus_set_cookie($cookie->name,$cookie->value,60*60);
-		$cookies[] = $cookie;
+	// need to check to see what cookies are new or updated
+	// $new_cookies = array of cookies returned by post
+	// $cookies = array of existing cookies sent
+	$new_cookies = $buf['cookies'];
+	for($x = count($cookies); $x>0; $x--) {
+		// if cookie is already in $cookies array, we remove old version		
+		foreach($new_cookies as $new_cookie) {
+			if($new_cookie->name == $cookies[$x]->name) {
+				unset($cookies[$x]);
+			}
+		}		
+	}
+	// now that existing cookies are out of the array, add all back in
+	foreach($new_cookies as $cookie) {
+		wpgplus_set_cookie($cookie);
+		$cookies[] = $cookie; 
 	}
 	$my_redirect = $buf['headers']['location'];
 	wpgplus_debug("\nLine 212, My Redirect was ". $my_redirect ."\n");
@@ -226,18 +306,32 @@ function wpgplus_login($postdata) {
 	if(is_wp_error($buf)) {
 		wp_die($buf);
 	}
-	foreach($buf['cookies'] as $cookie) {
-		wpgplus_set_cookie($cookie->name,$cookie->value,60*60);
-		$cookies[] = $cookie;
-	} 
+	// need to check to see what cookies are new or updated
+	// $new_cookies = array of cookies returned by post
+	// $cookies = array of existing cookies sent
+	$new_cookies = $buf['cookies'];
+	for($x = count($cookies); $x>0; $x--) {
+		// if cookie is already in $cookies array, we remove old version		
+		foreach($new_cookies as $new_cookie) {
+			if($new_cookie->name == $cookies[$x]->name) {
+				unset($cookies[$x]);
+			}
+		}		
+	}
+	// now that existing cookies are out of the array, add all back in
+	foreach($new_cookies as $cookie) {
+		wpgplus_set_cookie($cookie);
+		$cookies[] = $cookie; 
+	}
     
 	wpgplus_debug(date("Y-m-d H:i:s",time())." : login data posted\n");
-	wpgplus_debug("\n cookies were \n" . print_r($cookies,true) ."\n");
-	wpgplus_debug("\n Postdata was \n" . print_r($postdata[0],true) ."\n");
-	wpgplus_debug("\n Response from Google was \n" . print_r($buf['body'],true) ."\n");
+	//wpgplus_debug("\n cookies were \n" . print_r($cookies,true) ."\n");
+	//wpgplus_debug("\n Postdata was \n" . print_r($postdata[0],true) ."\n");
+	//wpgplus_debug("\n Response from Google was \n" . print_r($buf['body'],true) ."\n");
 }
 
 function wpgplus_update_profile_status($post_id) {	$wpgplus_debug_file= WP_PLUGIN_DIR .'/wpgplus/debug.txt';
+	/* Set up the post */ 
 	global $more; 
 	$more = 0; //only the post teaser please 
 	$my_post = get_post($post_id); 
@@ -265,11 +359,19 @@ function wpgplus_update_profile_status($post_id) {	$wpgplus_debug_file= WP_PLUGI
 		$my_post_text = $short_desc;
 	}
 	
+	/* Now let's go get the form */ 
 	wpgplus_debug(date("Y-m-d H:i:s",time())." : Getting form for posting\n");
 	wpgplus_debug(date("Y-m-d H:i:s",time())." : Post text is ". $my_post_text ."\n");
 	
-	// what cookies exist at this point? how will I keep track?
-	
+	// These are the cookies I know of
+	$cookies = array(); 
+	$my_cookies = array('GAPS','GALX','NID','SID','LSID','HSID','SSID','APISID','SAPISID','MEX'); 
+	foreach ($my_cookies as $name) {
+		$new_cookie = wpplus_get_cookie($name);
+		if($new_cookie) {
+			$cookies[] = wpgplus_get_cookie($name); 
+		}
+	}
 	$my_args = array('method' => 'GET',
 					 'timeout' => '45',
 					 'redirection' => 0,
@@ -278,16 +380,38 @@ function wpgplus_update_profile_status($post_id) {	$wpgplus_debug_file= WP_PLUGI
 					 'compress' => false,
 					 'decompress' => true,
 					 'ssl-verify' => false,
-					 'body' => $postdata[0],
 					 'cookies' => $cookies,
 					);					    	
-	$wp_remote_post('https://m.google.com/app/plus/?v=compose&group=m1c&hideloc=1',$my_args); 
-	wpgplus_debug(date("Y-m-d H:i:s",time())." : Got form, status was ". $buf['response']['code'] . "\n");
-	wpgplus_debug(date("Y-m-d H:i:s",time())." : Response was:\n". print_r($buf,true) ."\n\n");
-    
+	// Need to get from this URL and follow redirects				
+	$buf = wp_remote_request('https://m.google.com/app/plus/x/?v=compose&group=b0&hideloc=1',$my_args); 
+	if(is_wp_error($buf)) {
+		wp_die($buf);
+	}
+
+	// need to check to see what cookies are new or updated
+	// $new_cookies = array of cookies returned by post
+	// $cookies = array of existing cookies sent
+	$new_cookies = $buf['cookies'];
+	for($x = count($cookies); $x>0; $x--) {
+		// if cookie is already in $cookies array, we remove old version		
+		foreach($new_cookies as $new_cookie) {
+			if($new_cookie->name == $cookies[$x]->name) {
+				wpgplus_debug("\nUnsetting cookie for ". $cookies[$x]->name); 
+				unset($cookies[$x]);
+			}
+		}		
+	}
+	// now that existing cookies are out of the array, add all back in
+	foreach($new_cookies as $cookie) {
+		wpgplus_set_cookie($cookie);
+		$cookies[] = $cookie; 
+	}
+	$my_redirect = $buf['headers']['location']; 
+	wpgplus_debug("\nLine 404, My Redirect was ". $my_redirect ."\n");	
+	wpgplus_debug("\nShould be past redirect for form, respones was ". $print_r($buf,true) ."\n");
     $params = '';
     $doc = new DOMDocument;
-    @$doc->loadHTML($buf);
+    @$doc->loadHTML($buf['body']);
     $inputs = $doc->getElementsByTagName('input');
     foreach ($inputs as $input) {
 	    if (($input->getAttribute('name') != 'editcircles')) {
@@ -296,49 +420,41 @@ function wpgplus_update_profile_status($post_id) {	$wpgplus_debug_file= WP_PLUGI
     }
     $params .= 'newcontent=' . urlencode($my_post_text . ' ' . get_permalink($my_post) .' ');
 	
-    $baseurl = 'https://m.google.com/app/plus/?v=compose&group=m1c&hideloc=1';
+	// need to determine baseul from the last get, then add the right query string
+	$baseurl = 'https://m.google.com' . parse_url($header['url'], PHP_URL_PATH);
+    $baseurl .= '?v=compose&group=b0&hideloc=1&a=post';
+	/* group=m1c is 'your circles', group=b0 is 'public' */ 			
 
 	wpgplus_debug(date("Y-m-d H:i:s",time())." : Going to publish, params is ". $params ."\n");
 	wpgplus_debug(date("Y-m-d H:i:s",time())." : and base url is ". $baseurl ."\n");
 	
-    
-	// need to recreate cookie array here as well
-	$my_args = array('method' => 'POST',
+   	$my_args = array('method' => 'POST',
 					 'user-agent' => 'Mozilla/4.0 (compatible; MSIE 5.0; S60/3.0 NokiaN73-1/2.0(2.0617.0.0.7) Profile/MIDP-2.0 Configuration/CLDC-1.1)',
 					 'redirection' => 0,
 					 'body' => $params,
-	
-	
+					 'cookies' => $cookies,
 					);
-	/* group=m1c is 'your circles', group=b0 is 'public' */ 			
-	$buf = wp_remote_request($baseurl .'?v=compose&group=m1c&group=b0&hideloc=1&a=post',$my_args); 
-	
+	$buf = wp_remote_request($baseurl,$my_args); 
 	
 	$header = $buf['headers'];
-	wpgplus_debug(date("Y-m-d H:i:s",time())." : Posted form, status was ". curl_getinfo($ch, CURLINFO_HTTP_CODE) . "\n");
+	wpgplus_debug(date("Y-m-d H:i:s",time())." : Posted form, status was ". $buf['response']['code']	. "\n");
 	wpgplus_debug(date("Y-m-d H:i:s",time())." : Post text was ". $my_post_text ."\n");	
 	wpgplus_debug(date("Y-m-d H:i:s",time())." : Header of response was ". print_r($header,true) ."\n");
 	wpgplus_debug(date("Y-m-d H:i:s",time())." : Body was ". print_r($buf,true) ."\n");
+	// seems like the item still isn't posted at this point? 	
 }
 
 // GET logout: Just logout to look more human like and reset cookie :)
 function wpgplus_logout() { 
     echo "\n[+] GET Logging out: \n\n";
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_COOKIEJAR, WP_PLUGIN_DIR .'/wpgplus/cookies.txt');
-    curl_setopt($ch, CURLOPT_COOKIEFILE, WP_PLUGIN_DIR .'/wpgplus/cookies.txt');
-    curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/4.0 (compatible; MSIE 5.0; S60/3.0 NokiaN73-1/2.0(2.0617.0.0.7) Profile/MIDP-2.0 Configuration/CLDC-1.1)');
-    if(!(curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1))) {
-		wpgplus_debug(date("Y-m-d H:i:s",time())." : WPGPlus could NOT set CURLOPT_FOLLOWLOCATION\n");
-		wpgplus_debug("\nThis must be enabled for WPGPlus to work. Ask your hosting provider.\n");
-		wp_die('WPGPlus could not set required curl option for follow redirects'); 
-	};
-    curl_setopt($ch, CURLOPT_URL, 'https://www.google.com/m/logout');
-    $buf = curl_exec	($ch);
-    curl_close($ch);
-    //if ($GLOBALS['debug']) {
-	//	echo $buf;
-    //}
+	// do we need to send cookies on logout?
+	$my_args = array('method' => 'GET',
+					 'user-agent' => 'Mozilla/4.0 (compatible; MSIE 5.0; S60/3.0 NokiaN73-1/2.0(2.0617.0.0.7) Profile/MIDP-2.0 Configuration/CLDC-1.1)',
+					 'blocking' => false,
+					 'redirection' => 5,
+					);
+	$buf = wp_remote_request('https://www.google.com/m/logout',$my_args); 
+	// should we kill cookies here or just let the transients expire?
 }
 
 function wpgplus_tidy($str) {
@@ -347,17 +463,29 @@ function wpgplus_tidy($str) {
 
 // Expects an WP_Http_cookie object
 function wpgplus_set_Cookie($my_cookie) {
-	set_transient($my_cookie->name,$my_cookie,60*60);
+	if((!empty($my_cookie->expires)) && ($my_cookie->expires < time())) {
+		wpgplus_debug("\nNot setting expired cookie for " . $my_cookie->name . "\n");
+		return false; 
+	}
+	if(get_transient('wpgplus_cookie_' . $my_cookie->name)) {
+		wpgplus_debug("\nUpdating cookie for " . $my_cookie->name . "\n");
+	} else {
+		wpgplus_debug("\nSetting cookie for " . $my_cookie->name . "\n");
+	}
+	set_transient('wpgplus_cookie_'. $my_cookie->name,$my_cookie,60*60);
 }
 
+// Returns an WP_Http_Cookie object
 function wpgplus_get_cookie($name) {
-	$my_cookie = get_transient($name); 
-	$fp = @fopen($wpgplus_debug_file, 'a');
-	$debug_string .= "\nget_cookie, cookie is ". print_r($my_cookie,true) . "\n";
-	if($fp) {
-		fwrite($fp, $debug_string);	
+	$my_cookie = get_transient('wpgplus_cookie_'. $name); 
+	wpgplus_debug("\nCookie is " . print_r($my_cookie,true) . "\n");
+	if($my_cookie && (!empty($my_cookie->expires)) && ($my_cookie->expires > time())) {
+		wpgplus_debug("\nGetting cookie for ". $my_cookie->name . "\n");
+		return $my_cookie;
+	} else {
+		wpgplus_debug("\nNo cookies found for ". $name . "\n");
+		return false; 
 	}
-	return $my_cookie;
 }
 
 function wpgplus_debug($string) {
@@ -368,6 +496,4 @@ function wpgplus_debug($string) {
 	}
 	fclose($fp); 
 }
-
-
 ?>
