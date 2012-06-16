@@ -44,7 +44,7 @@ function wpgplus_login_data() {
 	//wpgplus_debug("\nBuffer is\n". print_r($buf,true) . "\n");
 	wpgplus_debug("\nWriting cookies from login get\n");
 	foreach($buf['cookies'] as $cookie) {
-		wpgplus_debug("\nThis cookie is ". print_r($cookie,true) . "\n");
+		//wpgplus_debug("\nThis cookie is ". print_r($cookie,true) . "\n");
 		wpgplus_set_cookie($cookie); 
 	} 
     $toreturn = '';
@@ -367,7 +367,7 @@ function wpgplus_update_profile_status($post_id) {	$wpgplus_debug_file= WP_PLUGI
 	$cookies = array(); 
 	$my_cookies = array('GAPS','GALX','NID','SID','LSID','HSID','SSID','APISID','SAPISID','MEX'); 
 	foreach ($my_cookies as $name) {
-		$new_cookie = wpplus_get_cookie($name);
+		$new_cookie = wpgplus_get_cookie($name);
 		if($new_cookie) {
 			$cookies[] = wpgplus_get_cookie($name); 
 		}
@@ -408,7 +408,7 @@ function wpgplus_update_profile_status($post_id) {	$wpgplus_debug_file= WP_PLUGI
 	}
 	$my_redirect = $buf['headers']['location']; 
 	wpgplus_debug("\nLine 404, My Redirect was ". $my_redirect ."\n");	
-	wpgplus_debug("\nShould be past redirect for form, respones was ". $print_r($buf,true) ."\n");
+	wpgplus_debug("\nShould be past redirect for form, response was ". $print_r($buf,true) ."\n");
     $params = '';
     $doc = new DOMDocument;
     @$doc->loadHTML($buf['body']);
@@ -463,14 +463,15 @@ function wpgplus_tidy($str) {
 
 // Expects an WP_Http_cookie object
 function wpgplus_set_Cookie($my_cookie) {
+	// cookies which have an expiration date and it is past should not be set
 	if((!empty($my_cookie->expires)) && ($my_cookie->expires < time())) {
-		wpgplus_debug("\nNot setting expired cookie for " . $my_cookie->name . "\n");
+		//wpgplus_debug("\nNot setting expired cookie for " . $my_cookie->name . "\n");
 		return false; 
 	}
 	if(get_transient('wpgplus_cookie_' . $my_cookie->name)) {
-		wpgplus_debug("\nUpdating cookie for " . $my_cookie->name . "\n");
+		//wpgplus_debug("\nUpdating cookie for " . $my_cookie->name . "\n");
 	} else {
-		wpgplus_debug("\nSetting cookie for " . $my_cookie->name . "\n");
+		//wpgplus_debug("\nSetting cookie for " . $my_cookie->name . "\n");
 	}
 	set_transient('wpgplus_cookie_'. $my_cookie->name,$my_cookie,60*60);
 }
@@ -478,12 +479,13 @@ function wpgplus_set_Cookie($my_cookie) {
 // Returns an WP_Http_Cookie object
 function wpgplus_get_cookie($name) {
 	$my_cookie = get_transient('wpgplus_cookie_'. $name); 
-	wpgplus_debug("\nCookie is " . print_r($my_cookie,true) . "\n");
+	// wpgplus_debug("\nCookie is " . print_r($my_cookie,true) . "\n");
+	// Cookies which have an expiration date and it is passed should not be returned
 	if(!$my_cookie || ((!empty($my_cookie->expires)) && ($my_cookie->expires < time()))) {
-		wpgplus_debug("\nNo cookies found for ". $name . "\n");
+		//wpgplus_debug("\nNo cookies found for ". $name . "\n");
 		return false; 
 	} else {
-		wpgplus_debug("\nGetting cookie for ". $my_cookie->name . "\n");
+		//wpgplus_debug("\nGetting cookie for ". $my_cookie->name . "\n");
 		return $my_cookie;
 	}
 }
