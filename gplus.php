@@ -44,7 +44,7 @@ function wpgplus_login_data() {
 	//wpgplus_debug("\nBuffer is\n". print_r($buf,true) . "\n");
 	wpgplus_debug("\nWriting cookies from login get\n");
 	foreach($buf['cookies'] as $cookie) {
-		//wpgplus_debug("\nThis cookie is ". print_r($cookie,true) . "\n");
+		wpgplus_debug("\nThis cookie is ". print_r($cookie,true) . "\n");
 		wpgplus_set_cookie($cookie); 
 	} 
     $toreturn = '';
@@ -479,12 +479,12 @@ function wpgplus_set_Cookie($my_cookie) {
 function wpgplus_get_cookie($name) {
 	$my_cookie = get_transient('wpgplus_cookie_'. $name); 
 	wpgplus_debug("\nCookie is " . print_r($my_cookie,true) . "\n");
-	if($my_cookie && (!empty($my_cookie->expires)) && ($my_cookie->expires > time())) {
-		wpgplus_debug("\nGetting cookie for ". $my_cookie->name . "\n");
-		return $my_cookie;
-	} else {
+	if(!$my_cookie || ((!empty($my_cookie->expires)) && ($my_cookie->expires < time()))) {
 		wpgplus_debug("\nNo cookies found for ". $name . "\n");
 		return false; 
+	} else {
+		wpgplus_debug("\nGetting cookie for ". $my_cookie->name . "\n");
+		return $my_cookie;
 	}
 }
 
