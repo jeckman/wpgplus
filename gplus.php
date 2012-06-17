@@ -12,14 +12,14 @@
 // (!) Works only with Google 2-step auth turned off AND mobile terms of service accepted
 
 function wpgplus_safe_post_google($post_id) {
-	wpgplus_debug(date("Y-m-d H:i:s",time())." : wgplus_safe_post_google running, post_id is " . $post_id ."\n");
-	//wpgplus_login(wpgplus_login_data());
+	//wpgplus_debug(date("Y-m-d H:i:s",time())." : wgplus_safe_post_google running, post_id is " . $post_id ."\n");
+	wpgplus_login(wpgplus_login_data());
 	//wpgplus_debug(date("Y-m-d H:i:s",time())." : wgplus_safe_post_google running,  past log in\n");
 	sleep(5);
 	wpgplus_update_profile_status($post_id);
-	//sleep(5);
-	wpgplus_debug(date("Y-m-d H:i:s",time())." : wgplus_safe_post_google running,  past update\n");
-	//wpgplus_logout(); //optional - log out
+	sleep(5);
+	//wpgplus_debug(date("Y-m-d H:i:s",time())." : wgplus_safe_post_google running,  past update\n");
+	wpgplus_logout(); //optional - log out
 	return true;
 }
 
@@ -41,7 +41,7 @@ function wpgplus_login_data() {
 					 'ssl-verify' => false
 					);
 	$buf = wp_remote_get('https://plus.google.com/',$my_args);
-	wpgplus_debug(date("Y-m-d H:i:s",time())." : just requested the login info\n");
+	//wpgplus_debug(date("Y-m-d H:i:s",time())." : just requested the login info\n");
 	//wpgplus_debug("\nBuffer is\n". print_r($buf,true) . "\n");
 	//wpgplus_debug("\nWriting cookies from login get\n");
 	foreach($buf['cookies'] as $cookie) {
@@ -65,7 +65,7 @@ function wpgplus_login_data() {
 		$my_action_url = $my_form->item(0)->getAttribute('action');	
 		return array(wpgplus_tidy($toreturn), $doc->getElementsByTagName('form')->item(0)->getAttribute('action'));
 	} else {
-		wpgplus_debug(date("Y-m-d H:i:s",time())." : Did not get a form to post login to\n");
+		//wpgplus_debug(date("Y-m-d H:i:s",time())." : Did not get a form to post login to\n");
 		wp_die('WPGPlus did not get a form in the response from google+'); 
 	}	
 }
@@ -117,7 +117,7 @@ function wpgplus_login($postdata) {
 		$cookies[] = $cookie; 
 	}
 	$my_redirect = $buf['headers']['location'];
-	wpgplus_debug("\nLine 114, My Redirect was ". $my_redirect ."\n");
+	//wpgplus_debug("\nLine 120, My Redirect was ". $my_redirect ."\n");
 	$my_args = array('method' => 'GET',
 					 'timeout' => '45',
 					 'user-agent' => 'Mozilla/4.0 (compatible; MSIE 5.0; S60/3.0 NokiaN73-1/2.0(2.0617.0.0.7) Profile/MIDP-2.0 Configuration/CLDC-1.1)',
@@ -151,7 +151,7 @@ function wpgplus_login($postdata) {
 		$cookies[] = $cookie; 
 	}
 	$my_redirect = $buf['headers']['location'];
-	wpgplus_debug("\nLine 126, My Redirect was ". $my_redirect ."\n");
+	//wpgplus_debug("\nLine 154, My Redirect was ". $my_redirect ."\n");
 
 	$my_args = array('method' => 'GET',
 					 'timeout' => '45',
@@ -186,7 +186,7 @@ function wpgplus_login($postdata) {
 		$cookies[] = $cookie; 
 	}
 	$my_redirect = $buf['headers']['location'];
-	wpgplus_debug("\nLine 148, My Redirect was ". $my_redirect ."\n");
+	//wpgplus_debug("\nLine 189, My Redirect was ". $my_redirect ."\n");
 
 	$my_args = array('method' => 'GET',
 					 'timeout' => '45',
@@ -221,7 +221,7 @@ function wpgplus_login($postdata) {
 		$cookies[] = $cookie; 
 	}
 	$my_redirect = $buf['headers']['location'];
-	wpgplus_debug("\nLine 170, My Redirect was ". $my_redirect ."\n");
+	//wpgplus_debug("\nLine 224, My Redirect was ". $my_redirect ."\n");
 
 	$my_args = array('method' => 'GET',
 					 'timeout' => '45',
@@ -256,7 +256,7 @@ function wpgplus_login($postdata) {
 		$cookies[] = $cookie; 
 	}
 	$my_redirect = 'https://plus.google.com' . $buf['headers']['location']; // for some reason this time the url is relative
-	wpgplus_debug("\nLine 191, My Redirect was ". $my_redirect ."\n");
+	//wpgplus_debug("\nLine 259, My Redirect was ". $my_redirect ."\n");
 	
 	$my_args = array('method' => 'GET',
 					 'timeout' => '45',
@@ -291,7 +291,7 @@ function wpgplus_login($postdata) {
 		$cookies[] = $cookie; 
 	}
 	$my_redirect = $buf['headers']['location'];
-	wpgplus_debug("\nLine 212, My Redirect was ". $my_redirect ."\n");
+	//wpgplus_debug("\nLine 294, My Redirect was ". $my_redirect ."\n");
 
 	$my_args = array('method' => 'GET',
 					 'timeout' => '45',
@@ -326,7 +326,7 @@ function wpgplus_login($postdata) {
 		$cookies[] = $cookie; 
 	}
     
-	wpgplus_debug(date("Y-m-d H:i:s",time())." : login data posted\n");
+	//wpgplus_debug(date("Y-m-d H:i:s",time())." : login data posted\n");
 	//wpgplus_debug("\n cookies were \n" . print_r($cookies,true) ."\n");
 	//wpgplus_debug("\n Postdata was \n" . print_r($postdata[0],true) ."\n");
 	//wpgplus_debug("\n Response from Google was \n" . print_r($buf['body'],true) ."\n");
@@ -339,11 +339,11 @@ function wpgplus_update_profile_status($post_id) {	$wpgplus_debug_file= WP_PLUGI
 	$my_post = get_post($post_id); 
 	//wpgplus_debug(date("Y-m-d H:i:s",time())." : Inside update_profile_states with post_id ". $post_id ." \n");
 	if(!empty($my_post->post_password)) { // post is password protected, don't post
-		wpgplus_debug(date("Y-m-d H:i:s",time())." : Post is password protected\n");
+		//wpgplus_debug(date("Y-m-d H:i:s",time())." : Post is password protected\n");
 		return;
 	}
 	if(get_post_type($my_post->ID) != 'post') { // only do this for posts
-		wpgplus_debug(date("Y-m-d H:i:s",time())." : Post type is ". get_post_type($my_post->ID) ."\n");
+		//wpgplus_debug(date("Y-m-d H:i:s",time())." : Post type is ". get_post_type($my_post->ID) ."\n");
 		return;
 	}
 	$my_post_text = get_post_meta($post_id,'wpgplus_message',true);  // if we have a post_message
@@ -412,7 +412,7 @@ function wpgplus_update_profile_status($post_id) {	$wpgplus_debug_file= WP_PLUGI
 	// form gets redirected to a new base url
 	$my_redirect = $buf['headers']['location']; 
 	//wpgplus_debug("\nShould be past redirect for form, response was ". print_r($buf,true) ."\n");
-    wpgplus_debug("\nLine 414, My Redirect was ". $my_redirect ."\n");	
+    //wpgplus_debug("\nLine 415, My Redirect was ". $my_redirect ."\n");	
 	//wpgplus_debug("\nGetting form at redirected url, cookies are ". print_r($cookies,true) ."\n"); 
 	// need to reget the form at the new url
 	$my_args = array('method' => 'GET',
@@ -457,6 +457,7 @@ function wpgplus_update_profile_status($post_id) {	$wpgplus_debug_file= WP_PLUGI
 	    }
 	}
     $params['newcontent'] = $my_post_text . ' ' . get_permalink($my_post);
+	$params['post'] = ' Post ';  // input type="submit" important too? 
 	
 	// need to determine baseul from the last get, then add the right query string
 	sleep(6); 
@@ -481,7 +482,7 @@ function wpgplus_update_profile_status($post_id) {	$wpgplus_debug_file= WP_PLUGI
 	//wpgplus_debug(date("Y-m-d H:i:s",time())." : Posted form, status was ". $buf['response']['code']	. "\n");
 	//wpgplus_debug(date("Y-m-d H:i:s",time())." : Post text was ". $my_post_text ."\n");	
 	//wpgplus_debug(date("Y-m-d H:i:s",time())." : Header of response was ". print_r($header,true) ."\n");
-	wpgplus_debug(date("Y-m-d H:i:s",time())." : Body was ". $buf['body'] ."\n");
+	//wpgplus_debug(date("Y-m-d H:i:s",time())." : Body was ". $buf['body'] ."\n");
 	// seems like the item still isn't posted at this point? 	
 }
 
@@ -534,7 +535,7 @@ function wpgplus_get_cookie($name) {
 function wpgplus_debug($string) {
 	$wpgplus_debug_file= WP_PLUGIN_DIR .'/wpgplus/debug.txt';
 	$fp = @fopen($wpgplus_debug_file, 'a');
-	if($fp) {
+	if	($fp) {
 		fwrite($fp, $string);
 	}
 	fclose($fp); 
