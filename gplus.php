@@ -533,11 +533,20 @@ function wpgplus_get_cookie($name) {
 }
 
 function wpgplus_debug($string) {
-	$wpgplus_debug_file= WP_PLUGIN_DIR .'/wpgplus/debug.txt';
-	$fp = @fopen($wpgplus_debug_file, 'a');
-	if	($fp) {
-		fwrite($fp, $string);
+	$wpgplusOptions = wpgplus_getAdminOptions();
+	if (!empty($wpgplusOptions)) {
+		foreach ($wpgplusOptions as $key => $option)
+		$wpgplusOptions[$key] = $option;
 	}
-	fclose($fp); 
+	if($wpgplusOptions['wpgplus_debug']) {
+		$wpgplus_debug_file= WP_PLUGIN_DIR .'/wpgplus/wpgplus_debug.txt';
+		$fp = @fopen($wpgplus_debug_file, 'a');
+		if	($fp) {
+			fwrite($fp, $string);
+			fclose($fp);
+		} 
+	} else {
+		return false;
+	}
 }
 ?>
