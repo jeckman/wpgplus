@@ -12,14 +12,14 @@
 // (!) Works only with Google 2-step auth turned off AND mobile terms of service accepted
 
 function wpgplus_safe_post_google($post_id) {
-	//wpgplus_debug(date("Y-m-d H:i:s",time())." : wgplus_safe_post_google running, post_id is " . $post_id ."\n");
+	wpgplus_debug(date("Y-m-d H:i:s",time())." : wgplus_safe_post_google running, post_id is " . $post_id ."\n");
 	wpgplus_login(wpgplus_login_data());
-	//wpgplus_debug(date("Y-m-d H:i:s",time())." : wgplus_safe_post_google running,  past log in\n");
+	wpgplus_debug(date("Y-m-d H:i:s",time())." : wgplus_safe_post_google running,  past log in\n");
 	sleep(5);
 	wpgplus_update_profile_status($post_id);
 	sleep(5);
-	//wpgplus_debug(date("Y-m-d H:i:s",time())." : wgplus_safe_post_google running,  past update\n");
-	wpgplus_logout(); //optional - log out
+	wpgplus_debug(date("Y-m-d H:i:s",time())." : wgplus_safe_post_google running,  past update\n");
+	wpgplus_logout(); 
 	return true;
 }
 
@@ -41,7 +41,7 @@ function wpgplus_login_data() {
 					 'ssl-verify' => false
 					);
 	$buf = wp_remote_get('https://plus.google.com/',$my_args);
-	//wpgplus_debug(date("Y-m-d H:i:s",time())." : just requested the login info\n");
+	wpgplus_debug(date("Y-m-d H:i:s",time())." : just requested the login info\n");
 	//wpgplus_debug("\nBuffer is\n". print_r($buf,true) . "\n");
 	//wpgplus_debug("\nWriting cookies from login get\n");
 	foreach($buf['cookies'] as $cookie) {
@@ -65,7 +65,7 @@ function wpgplus_login_data() {
 		$my_action_url = $my_form->item(0)->getAttribute('action');	
 		return array(wpgplus_tidy($toreturn), $doc->getElementsByTagName('form')->item(0)->getAttribute('action'));
 	} else {
-		//wpgplus_debug(date("Y-m-d H:i:s",time())." : Did not get a form to post login to\n");
+		wpgplus_debug(date("Y-m-d H:i:s",time())." : Did not get a form to post login to\n");
 		wp_die('WPGPlus did not get a form in the response from google+'); 
 	}	
 }
@@ -326,7 +326,7 @@ function wpgplus_login($postdata) {
 		$cookies[] = $cookie; 
 	}
     
-	//wpgplus_debug(date("Y-m-d H:i:s",time())." : login data posted\n");
+	wpgplus_debug(date("Y-m-d H:i:s",time())." : login data posted\n");
 	//wpgplus_debug("\n cookies were \n" . print_r($cookies,true) ."\n");
 	//wpgplus_debug("\n Postdata was \n" . print_r($postdata[0],true) ."\n");
 	//wpgplus_debug("\n Response from Google was \n" . print_r($buf['body'],true) ."\n");
@@ -337,13 +337,13 @@ function wpgplus_update_profile_status($post_id) {	$wpgplus_debug_file= WP_PLUGI
 	global $more; 
 	$more = 0; //only the post teaser please 
 	$my_post = get_post($post_id); 
-	//wpgplus_debug(date("Y-m-d H:i:s",time())." : Inside update_profile_states with post_id ". $post_id ." \n");
+	wpgplus_debug(date("Y-m-d H:i:s",time())." : Inside update_profile_states with post_id ". $post_id ." \n");
 	if(!empty($my_post->post_password)) { // post is password protected, don't post
-		//wpgplus_debug(date("Y-m-d H:i:s",time())." : Post is password protected\n");
+		wpgplus_debug(date("Y-m-d H:i:s",time())." : Post is password protected\n");
 		return;
 	}
 	if(get_post_type($my_post->ID) != 'post') { // only do this for posts
-		//wpgplus_debug(date("Y-m-d H:i:s",time())." : Post type is ". get_post_type($my_post->ID) ."\n");
+		wpgplus_debug(date("Y-m-d H:i:s",time())." : Post type is ". get_post_type($my_post->ID) ."\n");
 		return;
 	}
 	$my_post_text = get_post_meta($post_id,'wpgplus_message',true);  // if we have a post_message
@@ -462,8 +462,8 @@ function wpgplus_update_profile_status($post_id) {	$wpgplus_debug_file= WP_PLUGI
 	// need to determine baseul from the last get, then add the right query string
 	sleep(6); 
 	$baseurl = $my_redirect;
-	//wpgplus_debug(date("Y-m-d H:i:s",time())." : Going to publish, params is ". print_r($params,true) ."\n");
-	//wpgplus_debug(date("Y-m-d H:i:s",time())." : and base url is ". $baseurl ."\n");
+	wpgplus_debug(date("Y-m-d H:i:s",time())." : Going to publish, params is ". print_r($params,true) ."\n");
+	wpgplus_debug(date("Y-m-d H:i:s",time())." : and base url is ". $baseurl ."\n");
 	
    	$my_args = array('method' => 'POST',
 					 'timeout' => 45,
