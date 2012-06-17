@@ -66,9 +66,10 @@ function wpgplus_getAdminOptions() {
 	return $wpgplusOptions;
 }
   
-function wpgplus_setAdminOptions($wpgplus_username,$wpgplus_password) {
+function wpgplus_setAdminOptions($wpgplus_username,$wpgplus_password,$wpgplus_debug) {
   $wpgplusOptions = array('wpgplus_username' => $wpgplus_username,
-                              'wpgplus_password' => $wpgplus_password,
+                          'wpgplus_password' => $wpgplus_password,
+						  'wpgplus_debug' => $wpgplus_debug,	  
                               );
   update_option('wpgplusOptions', $wpgplusOptions);
 }
@@ -91,7 +92,8 @@ function wpgplus_subpanel() {
 				&& (!empty($_POST['wpgplus_username']))  && (!empty($_POST['wpgplus_password']))) { 
 			$wpgplus_username = $_POST['wpgplus_username'];
 			$wpgplus_password = $_POST['wpgplus_password'];
-			wpgplus_setAdminOptions($wpgplus_username, $wpgplus_password);
+			$wpgplus_debug = $_POST['wpgplus_debug'];
+			wpgplus_setAdminOptions($wpgplus_username, $wpgplus_password, $wpgplus_debug);
 			$flash = "Your settings have been saved. ";
 		} elseif (($wpgplusOptions['wpgplus_username'] != "") && ($wpgplusOptions['wpgplus_password'] != "")){
 			$flash = "";
@@ -100,7 +102,7 @@ function wpgplus_subpanel() {
 		} // end of posting complete
 	} else {
 		$flash = "You don't have enough access rights.";
-	}  // end of is first is_authoried  
+	}  // end of is first is_authorized  
   
 	if (wpgplus_is_authorized()) {
 		$wpgplusOptions = wpgplus_getAdminOptions();
@@ -120,6 +122,11 @@ function wpgplus_subpanel() {
 				echo '<p>Google Plus Password: ';
 				echo '<input type="password" name="wpgplus_password" value="';
 				echo htmlentities($wpgplusOptions['wpgplus_password']) .'" size="35" /></p>';
+			    echo '<p>Enable debug file: <input type="checkbox" name="wpbook_enable_debug" value="true" ';
+				if( htmlentities($wpgplusOptions['wpgplus_debug']) == "true") {
+					echo("checked");
+				}
+				echo ' id="wpgplus_debug" ></p>';
 				echo '<p><input type="submit" value="Save" class="button-primary"';
 				echo ' name="wpgplus_save_button" /></form></p>';
 	} else {
