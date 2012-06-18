@@ -1,7 +1,7 @@
 === WPGPlus ===
 Contributors: johneckman
 Tags: google plus, platform, application, blog
-Stable tag: 0.8
+Stable tag: 0.8.1
 Tested up to: 3.3.2
 Requires at least: 3.2
 
@@ -58,6 +58,21 @@ Hard to say. Most likely this is due to either:
 You can enable debugging in the wpgplus settings page and see if that produces
 useful output. 
 
+= Can I post to pages instead of my profile? =
+
+Not yet. Working on it. 
+
+= Why does the plugin ask for my Google+ username and password? Why not use OAuth?
+
+Because for now the Google+ API offered by Google is read-only - no posting allowed. 
+
+As soon as they release a read-write API I will work on switching to it and 
+eliminate the need for username and password to be in the database. 
+
+If you really don't want your username and password in the WordPress database, 
+you could hack the wpgplus_login_data() function and hard-code your username and
+password into it - they'd still be accessible to someone with filesystem access. 
+
 == Changelog ==
 
 = 0.8.1 =
@@ -95,7 +110,7 @@ useful output.
 * Initial release
 
 == To-do ==
-* Add "google+ message" meta-box rather than excerpt, allowing markdown style
 * Get google+ to recognize URL of permalink and treat it as it does from
-  web client
+  web client - image, excerpt
 * Explore full web interface not mobile one, which is limited in functionality
+* Posting to pages?
