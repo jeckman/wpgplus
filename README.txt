@@ -15,11 +15,11 @@ Posts are made to "Public" circle. If you include an excerpt (using the
 post excerpt box, not just the "teaser" before the <more> tag) it will
 be used, otherwise post-content is used. 
 
-This plugin requires PHP 5 and the cURL library.
+This plugin requires PHP 5 and a compatible transport layer for WordPress
+HTTP API - most likely this means cURL. 
 
 Still working on cleaning up the output, working on getting
 Google+ to recognize the links posted, show images, etc. 
-
 
 This plugin is based on Dmitry Sandalov's standalone PHP script for 
 publishing to Google+ from php. 
@@ -37,8 +37,31 @@ publishing to Google+ from php.
 
 == Frequently Asked Questions ==
 
+= Why aren't my custom post types or pages posted? =
+
+WPGPlus is currently only set to post to Google+ when the post type is "post."
+
+To enable other post types, open wpgplus.php and find the "if" statement in the
+beginning of the wpgplus_update_profile_status() function, where the code checks
+for if post_type is not equal to 'post' - comment that whole if() { } section out
+to get all types, or add into the if condition all the post types you want to 
+specifically include. 
+
+= Why doesn't it work for me? =
+
+Hard to say. Most likely this is due to either:
+ * server config (no available HTTP transport that can POST to and GET from google+)
+ * google+ account config (if your google+ account has two factor authentication
+   set, or expects confirmation of your mobile phone number, or other security
+   issues
+ * google+ waiting for you to accept the mobile terms of service
+You can enable debugging in the wpgplus settings page and see if that produces
+useful output. 
 
 == Changelog ==
+
+= 0.8.1 =
+* Left an outdated "echo" statement in the logout function for 0.8 - fixed
 
 = 0.8 = 
 * Extensive re-write to be more "WordPress Like"

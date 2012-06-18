@@ -42,8 +42,8 @@ function wpgplus_login_data() {
 					);
 	$buf = wp_remote_get('https://plus.google.com/',$my_args);
 	wpgplus_debug(date("Y-m-d H:i:s",time())." : just requested the login info\n");
-	//wpgplus_debug("\nBuffer is\n". print_r($buf,true) . "\n");
-	//wpgplus_debug("\nWriting cookies from login get\n");
+	wpgplus_debug("\nBuffer is\n". print_r($buf,true) . "\n");
+	wpgplus_debug("\nWriting cookies from login get\n");
 	foreach($buf['cookies'] as $cookie) {
 		//wpgplus_debug("\nThis cookie is ". print_r($cookie,true) . "\n");
 		wpgplus_set_cookie($cookie); 
@@ -73,7 +73,7 @@ function wpgplus_login_data() {
 // POST login: https://accounts.google.com/ServiceLoginAuth
 // Follow a series of redirects and set cookies
 function wpgplus_login($postdata) {
-	//wpgplus_debug("\nPOSTing username and pass to: " . $postdata[1] . "\n\n");
+	wpgplus_debug("\nPOSTing username and pass to: " . $postdata[1] . "\n\n");
 	$cookies = array();
 	$my_cookie = wpgplus_get_cookie('GAPS');   // recreate cookie object
 	if($my_cookie) {
@@ -117,7 +117,7 @@ function wpgplus_login($postdata) {
 		$cookies[] = $cookie; 
 	}
 	$my_redirect = $buf['headers']['location'];
-	//wpgplus_debug("\nLine 120, My Redirect was ". $my_redirect ."\n");
+	wpgplus_debug("\nLine 120, My Redirect was ". $my_redirect ."\n");
 	$my_args = array('method' => 'GET',
 					 'timeout' => '45',
 					 'user-agent' => 'Mozilla/4.0 (compatible; MSIE 5.0; S60/3.0 NokiaN73-1/2.0(2.0617.0.0.7) Profile/MIDP-2.0 Configuration/CLDC-1.1)',
@@ -151,7 +151,7 @@ function wpgplus_login($postdata) {
 		$cookies[] = $cookie; 
 	}
 	$my_redirect = $buf['headers']['location'];
-	//wpgplus_debug("\nLine 154, My Redirect was ". $my_redirect ."\n");
+	wpgplus_debug("\nLine 154, My Redirect was ". $my_redirect ."\n");
 
 	$my_args = array('method' => 'GET',
 					 'timeout' => '45',
@@ -186,7 +186,7 @@ function wpgplus_login($postdata) {
 		$cookies[] = $cookie; 
 	}
 	$my_redirect = $buf['headers']['location'];
-	//wpgplus_debug("\nLine 189, My Redirect was ". $my_redirect ."\n");
+	wpgplus_debug("\nLine 189, My Redirect was ". $my_redirect ."\n");
 
 	$my_args = array('method' => 'GET',
 					 'timeout' => '45',
@@ -221,7 +221,7 @@ function wpgplus_login($postdata) {
 		$cookies[] = $cookie; 
 	}
 	$my_redirect = $buf['headers']['location'];
-	//wpgplus_debug("\nLine 224, My Redirect was ". $my_redirect ."\n");
+	wpgplus_debug("\nLine 224, My Redirect was ". $my_redirect ."\n");
 
 	$my_args = array('method' => 'GET',
 					 'timeout' => '45',
@@ -256,7 +256,7 @@ function wpgplus_login($postdata) {
 		$cookies[] = $cookie; 
 	}
 	$my_redirect = 'https://plus.google.com' . $buf['headers']['location']; // for some reason this time the url is relative
-	//wpgplus_debug("\nLine 259, My Redirect was ". $my_redirect ."\n");
+	wpgplus_debug("\nLine 259, My Redirect was ". $my_redirect ."\n");
 	
 	$my_args = array('method' => 'GET',
 					 'timeout' => '45',
@@ -291,7 +291,7 @@ function wpgplus_login($postdata) {
 		$cookies[] = $cookie; 
 	}
 	$my_redirect = $buf['headers']['location'];
-	//wpgplus_debug("\nLine 294, My Redirect was ". $my_redirect ."\n");
+	wpgplus_debug("\nLine 294, My Redirect was ". $my_redirect ."\n");
 
 	$my_args = array('method' => 'GET',
 					 'timeout' => '45',
@@ -329,7 +329,7 @@ function wpgplus_login($postdata) {
 	wpgplus_debug(date("Y-m-d H:i:s",time())." : login data posted\n");
 	//wpgplus_debug("\n cookies were \n" . print_r($cookies,true) ."\n");
 	//wpgplus_debug("\n Postdata was \n" . print_r($postdata[0],true) ."\n");
-	//wpgplus_debug("\n Response from Google was \n" . print_r($buf['body'],true) ."\n");
+	wpgplus_debug("\n Response from Google was \n" . print_r($buf['body'],true) ."\n");
 }
 // Prepare the update, get the right form, post the update
 function wpgplus_update_profile_status($post_id) {	$wpgplus_debug_file= WP_PLUGIN_DIR .'/wpgplus/debug.txt';
@@ -362,7 +362,7 @@ function wpgplus_update_profile_status($post_id) {	$wpgplus_debug_file= WP_PLUGI
 	}
 	
 	/* Now let's go get the form */ 
-	//wpgplus_debug(date("Y-m-d H:i:s",time())." : Getting form for posting\n");
+	wpgplus_debug(date("Y-m-d H:i:s",time())." : Getting form for posting\n");
 	//wpgplus_debug(date("Y-m-d H:i:s",time())." : Post text is ". $my_post_text ."\n");
 	
 	// These are the cookies I know of - not sure all are needed
@@ -412,7 +412,7 @@ function wpgplus_update_profile_status($post_id) {	$wpgplus_debug_file= WP_PLUGI
 	// form gets redirected to a new base url
 	$my_redirect = $buf['headers']['location']; 
 	//wpgplus_debug("\nShould be past redirect for form, response was ". print_r($buf,true) ."\n");
-    //wpgplus_debug("\nLine 415, My Redirect was ". $my_redirect ."\n");	
+    wpgplus_debug("\nLine 415, My Redirect was ". $my_redirect ."\n");	
 	//wpgplus_debug("\nGetting form at redirected url, cookies are ". print_r($cookies,true) ."\n"); 
 	// need to reget the form at the new url
 	$my_args = array('method' => 'GET',
@@ -477,26 +477,31 @@ function wpgplus_update_profile_status($post_id) {	$wpgplus_debug_file= WP_PLUGI
 					 'cookies' => $cookies,
 					 'headers' => array('Referer' => $baseurl),
 					);
-	$buf = wp_remote_post($baseurl . '&a=post',$my_args); 
+	$buf = wp_remote_post($baseurl . '&a=post',$my_args);
+	if(is_wp_error($buf)) {
+		wp_die($buf);
+	}	
 	$header = $buf['headers'];
-	//wpgplus_debug(date("Y-m-d H:i:s",time())." : Posted form, status was ". $buf['response']['code']	. "\n");
+	wpgplus_debug(date("Y-m-d H:i:s",time())." : Posted form, status was ". $buf['response']['code']	. "\n");
 	//wpgplus_debug(date("Y-m-d H:i:s",time())." : Post text was ". $my_post_text ."\n");	
 	//wpgplus_debug(date("Y-m-d H:i:s",time())." : Header of response was ". print_r($header,true) ."\n");
-	//wpgplus_debug(date("Y-m-d H:i:s",time())." : Body was ". $buf['body'] ."\n");
+	wpgplus_debug(date("Y-m-d H:i:s",time())." : Body was ". $buf['body'] ."\n");
 	// seems like the item still isn't posted at this point? 	
 }
 
 // GET logout: Just logout to look more human like and reset cookie :)
 function wpgplus_logout() { 
-    echo "\n[+] GET Logging out: \n\n";
+    wpgplus_debug("\nLogging out: \n");
 	// do we need to send cookies on logout?
 	$my_args = array('method' => 'GET',
 					 'user-agent' => 'Mozilla/4.0 (compatible; MSIE 5.0; S60/3.0 NokiaN73-1/2.0(2.0617.0.0.7) Profile/MIDP-2.0 Configuration/CLDC-1.1)',
 					 'blocking' => false,
-					 'redirection' => 5,
+					 'redirection' => 0,
 					);
 	$buf = wp_remote_request('https://www.google.com/m/logout',$my_args); 
-	// should we kill cookies here or just let the transients expire?
+	if(is_wp_error($buf)) {
+		wp_die($buf);
+	}// should we kill cookies here or just let the transients expire?
 }
 
 function wpgplus_tidy($str) {
