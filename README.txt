@@ -1,7 +1,7 @@
 === WPGPlus ===
 Contributors: johneckman
 Tags: google plus, platform, application, blog
-Stable tag: 0.8.1
+Stable tag: 0.8.2
 Tested up to: 3.3.2
 Requires at least: 3.2
 
@@ -75,6 +75,12 @@ password into it - they'd still be accessible to someone with filesystem access.
 
 == Changelog ==
 
+= 0.8.2 = 
+* That's what I get for weekend coding. Left a number of old debug statements
+  in the main plugin file that weren't using the new function. 
+* Updated plugin requirements - needs WordPress 3.2 as a major issue with redirection => 0
+  was fixed in that release. Given 3.4 is out now I'm ok with that. 
+  
 = 0.8.1 =
 * Left an outdated "echo" statement in the logout function for 0.8 - fixed
 

@@ -5,8 +5,8 @@ Date: 2012, June 18th
 Description: Plugin to cross-post WordPress blog posts to Google+ 
 Author: John Eckman
 Author URI: http://johneckman.com
-Version: 0.8.1
-Stable tag: 0.8.1
+Version: 0.8.2
+Stable tag: 0.8.2
 */
   
 /*
@@ -142,38 +142,21 @@ function wpgplus_publish_to_gplus($post) {
 	$wpgplus_debug_file= WP_PLUGIN_DIR .'/wpgplus/debug.txt';
 	if (!version_compare(PHP_VERSION, '5.0.0', '<')) {
 		include_once(WP_PLUGIN_DIR .'/wpgplus/gplus.php');
-		$fp = @fopen($wpgplus_debug_file, 'a');
-		$debug_string=date("Y-m-d H:i:s",time())." : publish_to_gplus running, included wpgplus.php\n";
-		if($fp) {
-			fwrite($fp, $debug_string);
-		} 
+		wpgplus_debug(date("Y-m-d H:i:s",time())." : publish_to_gplus running, included wpgplus.php\n");
 	} else {
 		wp_die("Sorry, but you can't run this plugin, it requires PHP 5 or higher.");
 	}	
 	$publish_meta = get_post_meta($post->ID,'wpgplus_publish',true); 
 	if(($publish_meta == 'no')) { // user chose not to post this one
-		$fp = @fopen($wpgplus_debug_file, 'a');
-		$debug_string=date("Y-m-d H:i:s",time())." : Post_meta was set to not publish, postID is " . $my_post_id ."\n";
-		if($fp) {
-			fwrite($fp, $debug_string);
-		}
+		wpgplus_debug(date("Y-m-d H:i:s",time())." : Post_meta was set to not publish, postID is " . $my_post_id ."\n");
 		return;
 	}
 	$my_post_id = $post->ID;
-	$fp = @fopen($wpgplus_debug_file, 'a');
-	$debug_string=date("Y-m-d H:i:s",time())." : publish_to_gplus running, postID is " . $my_post_id ."\n";
-	if($fp) {
-		fwrite($fp, $debug_string);
-	}
+	wpgplus_debug(date("Y-m-d H:i:s",time())." : publish_to_gplus running, postID is " . $my_post_id ."\n");
 	if($my_post_id && ($my_post_id != '')) {
 		wpgplus_safe_post_google($my_post_id);
 	}
-	$fp = @fopen($wpgplus_debug_file, 'a');
-	$debug_string=date("Y-m-d H:i:s",time())." : publish_to_gplus done running\n";
-	if($fp) {
-		fwrite($fp, $debug_string);
-	}
-	
+	wpgplus_debug(date("Y-m-d H:i:s",time())." : publish_to_gplus done running\n");	
 } // end of function wpgplus_publish_to_gplus
   
 /*
@@ -255,8 +238,8 @@ function wpgplus_activation_check(){
     deactivate_plugins(basename(__FILE__)); // Deactivate ourself
     wp_die("Sorry, but you can't run this plugin, it requires PHP 5 or higher.");
   }
-  if (version_compare($wp_version, '2.9', '<')) {
-    wp_die("This plugin requires WordPress 2.6 or greater.");
+  if (version_compare($wp_version, '3.2', '<')) {
+    wp_die("This plugin requires WordPress 3.2 or greater.");
   }
 }
   

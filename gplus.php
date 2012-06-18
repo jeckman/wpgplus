@@ -543,7 +543,7 @@ function wpgplus_debug($string) {
 		foreach ($wpgplusOptions as $key => $option)
 		$wpgplusOptions[$key] = $option;
 	}
-	if($wpgplusOptions['wpgplus_debug']) {
+	if($wpgplusOptions['wpgplus_debug'] == true) {
 		$wpgplus_debug_file= WP_PLUGIN_DIR .'/wpgplus/wpgplus_debug.txt';
 		$fp = @fopen($wpgplus_debug_file, 'a');
 		if	($fp) {
