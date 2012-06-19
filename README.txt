@@ -1,7 +1,7 @@
 === WPGPlus ===
 Contributors: johneckman
 Tags: google plus, platform, application, blog
-Stable tag: 0.8.2
+Stable tag: 0.8.3
 Tested up to: 3.3.2
 Requires at least: 3.2
 
@@ -62,7 +62,7 @@ useful output.
 
 Not yet. Working on it. 
 
-= Why does the plugin ask for my Google+ username and password? Why not use OAuth?
+= Why does the plugin ask for my Google+ username and password? Why not use OAuth? =
 
 Because for now the Google+ API offered by Google is read-only - no posting allowed. 
 
