@@ -465,10 +465,11 @@ function wpgplus_update_profile_status($post_id) {	$wpgplus_debug_file= WP_PLUGI
 	wpgplus_debug(date("Y-m-d H:i:s",time())." : Going to publish, params is ". print_r($params,true) ."\n");
 	wpgplus_debug(date("Y-m-d H:i:s",time())." : and base url is ". $baseurl ."\n");
 	
+	// This last post should NOT follow redirects
    	$my_args = array('method' => 'POST',
 					 'timeout' => 45,
 					 'user-agent' => 'Mozilla/4.0 (compatible; MSIE 5.0; S60/3.0 NokiaN73-1/2.0(2.0617.0.0.7) Profile/MIDP-2.0 Configuration/CLDC-1.1)',
-					 'redirection' => 5,
+					 'redirection' => 0,
 					 'blocking' => true,
 					 'compress' => false,
 					 'decompress' => true,

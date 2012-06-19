@@ -75,6 +75,10 @@ password into it - they'd still be accessible to someone with filesystem access.
 
 == Changelog ==
 
+= 0.8.3 = 
+* One user reported multiple posts to Google+ for one WordPress post, so I tightened
+  the final POST to google+ to not follow redirects, which should not be required. 
+  
 = 0.8.2 = 
 * That's what I get for weekend coding. Left a number of old debug statements
   in the main plugin file that weren't using the new function. 
