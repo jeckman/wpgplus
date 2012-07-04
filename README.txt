@@ -1,7 +1,7 @@
 === WPGPlus ===
 Contributors: johneckman
 Tags: google plus, platform, application, blog
-Stable tag: 0.8.3
+Stable tag: 0.8.4
 Tested up to: 3.3.2
 Requires at least: 3.2
 
@@ -74,6 +74,8 @@ you could hack the wpgplus_login_data() function and hard-code your username and
 password into it - they'd still be accessible to someone with filesystem access. 
 
 == Changelog ==
+= 0.8.4 = 
+* Was not checking for wp_error object on first request, now we are
 
 = 0.8.3 = 
 * One user reported multiple posts to Google+ for one WordPress post, so I tightened
