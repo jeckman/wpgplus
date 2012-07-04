@@ -33,7 +33,7 @@ function wpgplus_login_data() {
 	}
 	$my_args = array('method' => 'GET',
 					 'timeout' => '5',
-					 'redirection' => '5',
+					 'redirection' => '0',
 					 'user-agent' => 'Mozilla/4.0 (compatible; MSIE 5.0; S60/3.0 NokiaN73-1/2.0(2.0617.0.0.7) Profile/MIDP-2.0 Configuration/CLDC-1.1)',
 					 'blocking' => true,
 					 'compress' => false,
@@ -44,6 +44,9 @@ function wpgplus_login_data() {
 	wpgplus_debug(date("Y-m-d H:i:s",time())." : just requested the login info\n");
 	wpgplus_debug("\nBuffer is\n". print_r($buf,true) . "\n");
 	wpgplus_debug("\nWriting cookies from login get\n");
+	if(is_wp_error($buf)) {
+		wp_die($buf);
+	}
 	foreach($buf['cookies'] as $cookie) {
 		//wpgplus_debug("\nThis cookie is ". print_r($cookie,true) . "\n");
 		wpgplus_set_cookie($cookie); 
