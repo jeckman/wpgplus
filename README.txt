@@ -1,7 +1,7 @@
 === WPGPlus ===
 Contributors: johneckman
 Tags: google plus, platform, application, blog
-Stable tag: 0.8.4
+Stable tag: 0.8.5
 Tested up to: 3.3.2
 Requires at least: 3.2
 
@@ -74,6 +74,13 @@ you could hack the wpgplus_login_data() function and hard-code your username and
 password into it - they'd still be accessible to someone with filesystem access. 
 
 == Changelog ==
+= 0.8.5 =
+* Setting redirection back to 5 on the login check. I'd prefer not to rely on redirection
+  this way, given that on some hosts curl redirection isn't allowed, but that will require
+  a more fundamental rewrite I haven't had time to do. (I'd have to handle the redirection
+  myself as current is done during the posting process, and all the variants for different
+  global versions of google+
+
 = 0.8.4 = 
 * Was not checking for wp_error object on first request, now we are
 
