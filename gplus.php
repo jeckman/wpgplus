@@ -121,218 +121,228 @@ function wpgplus_login($postdata) {
 	}
 	$my_redirect = $buf['headers']['location'];
 	wpgplus_debug("\nLine 120, My Redirect was ". $my_redirect ."\n");
-	$my_args = array('method' => 'GET',
-					 'timeout' => '45',
-					 'user-agent' => 'Mozilla/4.0 (compatible; MSIE 5.0; S60/3.0 NokiaN73-1/2.0(2.0617.0.0.7) Profile/MIDP-2.0 Configuration/CLDC-1.1)',
-					 'blocking' => true,
-					 'ssl-verify' => false,
-					 'redirection' => 0,
-					 'cookies' => $cookies,
-					);
-	/* POST to https://accounts.google.com/ServiceLoginAuth
-	*   = 302 redirect to https://accounts.google.com/CheckCookie
-	*/ 
-	$buf = wp_remote_get($my_redirect,$my_args); 
-	if(is_wp_error($buf)) {
-		wp_die($buf);
-	}
-	// need to check to see what cookies are new or updated
-	// $new_cookies = array of cookies returned by post
-	// $cookies = array of existing cookies sent
-	$new_cookies = $buf['cookies'];
-	for($x = count($cookies); $x>0; $x--) {
-		// if cookie is already in $cookies array, we remove old version		
-		foreach($new_cookies as $new_cookie) {
-			if($new_cookie->name == $cookies[$x]->name) {
-				unset($cookies[$x]);
-			}
-		}		
-	}
-	// now that existing cookies are out of the array, add all back in
-	foreach($new_cookies as $cookie) {
-		wpgplus_set_cookie($cookie);
-		$cookies[] = $cookie; 
-	}
-	$my_redirect = $buf['headers']['location'];
-	wpgplus_debug("\nLine 154, My Redirect was ". $my_redirect ."\n");
-
-	$my_args = array('method' => 'GET',
-					 'timeout' => '45',
-					 'user-agent' => 'Mozilla/4.0 (compatible; MSIE 5.0; S60/3.0 NokiaN73-1/2.0(2.0617.0.0.7) Profile/MIDP-2.0 Configuration/CLDC-1.1)',
-					 'blocking' => true,
-					 'ssl-verify' => false,
-					 'cookies' => $cookies,
-					 'redirection' => 0,
-	);
-	/* * GET to https://accounts.google.com/CheckCookie
-	 *   = 302 redirect to https://plus.google.com/app/plus/x/?login
-	 */ 
-	$buf = wp_remote_get($my_redirect,$my_args);
-	if(is_wp_error($buf)) {
-		wp_die($buf);
-	}
-	// need to check to see what cookies are new or updated
-	// $new_cookies = array of cookies returned by post
-	// $cookies = array of existing cookies sent
-	$new_cookies = $buf['cookies'];
-	for($x = count($cookies); $x>0; $x--) {
-		// if cookie is already in $cookies array, we remove old version		
-		foreach($new_cookies as $new_cookie) {
-			if($new_cookie->name == $cookies[$x]->name) {
-				unset($cookies[$x]);
-			}
-		}		
-	}
-	// now that existing cookies are out of the array, add all back in
-	foreach($new_cookies as $cookie) {
-		wpgplus_set_cookie($cookie);
-		$cookies[] = $cookie; 
-	}
-	$my_redirect = $buf['headers']['location'];
-	wpgplus_debug("\nLine 189, My Redirect was ". $my_redirect ."\n");
-
-	$my_args = array('method' => 'GET',
-					 'timeout' => '45',
-					 'user-agent' => 'Mozilla/4.0 (compatible; MSIE 5.0; S60/3.0 NokiaN73-1/2.0(2.0617.0.0.7) Profile/MIDP-2.0 Configuration/CLDC-1.1)',
-					 'blocking' => true,
-					 'ssl-verify' => false,
-					 'cookies' => $cookies,
-					 'redirection' => 0,
-	);
-	/* GET to https://plus.google.com/app/plus/x/?login
-	 *   = 302 redirect to https://plus.google.com/app/plus/x/?login=1 
-	 */ 
-	$buf = wp_remote_get($my_redirect,$my_args);
-	if(is_wp_error($buf)) {
-		wp_die($buf);
-	}
-	// need to check to see what cookies are new or updated
-	// $new_cookies = array of cookies returned by post
-	// $cookies = array of existing cookies sent
-	$new_cookies = $buf['cookies'];
-	for($x = count($cookies); $x>0; $x--) {
-		// if cookie is already in $cookies array, we remove old version		
-		foreach($new_cookies as $new_cookie) {
-			if($new_cookie->name == $cookies[$x]->name) {
-				unset($cookies[$x]);
-			}
-		}		
-	}
-	// now that existing cookies are out of the array, add all back in
-	foreach($new_cookies as $cookie) {
-		wpgplus_set_cookie($cookie);
-		$cookies[] = $cookie; 
-	}
-	$my_redirect = $buf['headers']['location'];
-	wpgplus_debug("\nLine 224, My Redirect was ". $my_redirect ."\n");
-
-	$my_args = array('method' => 'GET',
-					 'timeout' => '45',
-					 'user-agent' => 'Mozilla/4.0 (compatible; MSIE 5.0; S60/3.0 NokiaN73-1/2.0(2.0617.0.0.7) Profile/MIDP-2.0 Configuration/CLDC-1.1)',
-					 'blocking' => true,
-					 'ssl-verify' => false,
-					 'cookies' => $cookies,
-					 'redirection' => 0,
-	);
-	/* GET to https://plus.google.com/app/plus/x/?login=1
-	 *   = 302 redirect to https://plus.google.com/app/plus/x/#/?login=1
-	 */ 
-	$buf = wp_remote_get($my_redirect,$my_args);
-	if(is_wp_error($buf)) {
-		wp_die($buf);
-	}
-	// need to check to see what cookies are new or updated
-	// $new_cookies = array of cookies returned by post
-	// $cookies = array of existing cookies sent
-	$new_cookies = $buf['cookies'];
-	for($x = count($cookies); $x>0; $x--) {
-		// if cookie is already in $cookies array, we remove old version		
-		foreach($new_cookies as $new_cookie) {
-			if($new_cookie->name == $cookies[$x]->name) {
-				unset($cookies[$x]);
-			}
-		}		
-	}
-	// now that existing cookies are out of the array, add all back in
-	foreach($new_cookies as $cookie) {
-		wpgplus_set_cookie($cookie);
-		$cookies[] = $cookie; 
-	}
-	$my_redirect = 'https://plus.google.com' . $buf['headers']['location']; // for some reason this time the url is relative
-	wpgplus_debug("\nLine 259, My Redirect was ". $my_redirect ."\n");
 	
-	$my_args = array('method' => 'GET',
-					 'timeout' => '45',
-					 'user-agent' => 'Mozilla/4.0 (compatible; MSIE 5.0; S60/3.0 NokiaN73-1/2.0(2.0617.0.0.7) Profile/MIDP-2.0 Configuration/CLDC-1.1)',
-					 'blocking' => true,
-					 'ssl-verify' => false,
-					 'cookies' => $cookies,
-					 'redirection' => 0,
-	);
-	/* GET to https://plus.google.com/app/plus/x/#/?login=1
-	 *   = 302 redirect to https://plus.google.com/app/plus/x/?v=stream
-	 */
-	$buf = wp_remote_get($my_redirect,$my_args);
-	if(is_wp_error($buf)) {
-		wp_die($buf);
-	}
-	// need to check to see what cookies are new or updated
-	// $new_cookies = array of cookies returned by post
-	// $cookies = array of existing cookies sent
-	$new_cookies = $buf['cookies'];
-	for($x = count($cookies); $x>0; $x--) {
-		// if cookie is already in $cookies array, we remove old version		
-		foreach($new_cookies as $new_cookie) {
-			if($new_cookie->name == $cookies[$x]->name) {
-				unset($cookies[$x]);
-			}
-		}		
-	}
+	if($my_redirect) {
+		$my_args = array('method' => 'GET',
+						 'timeout' => '45',
+					 	'user-agent' => 'Mozilla/4.0 (compatible; MSIE 5.0; S60/3.0 NokiaN73-1/2.0(2.0617.0.0.7) Profile/MIDP-2.0 Configuration/CLDC-1.1)',
+					 	'blocking' => true,
+					 	'ssl-verify' => false,
+					 	'redirection' => 0,
+					 	'cookies' => $cookies,
+						); 
+		$buf = wp_remote_get($my_redirect,$my_args); 
+		if(is_wp_error($buf)) {
+			wp_die($buf);
+		}
+		// need to check to see what cookies are new or updated
+		// $new_cookies = array of cookies returned by post
+		// $cookies = array of existing cookies sent
+		$new_cookies = $buf['cookies'];
+		for($x = count($cookies); $x>0; $x--) {
+			// if cookie is already in $cookies array, we remove old version		
+			foreach($new_cookies as $new_cookie) {
+				if($new_cookie->name == $cookies[$x]->name) {
+					unset($cookies[$x]);
+				}
+			}		
+		}
 	// now that existing cookies are out of the array, add all back in
-	foreach($new_cookies as $cookie) {
-		wpgplus_set_cookie($cookie);
-		$cookies[] = $cookie; 
-	}
-	$my_redirect = $buf['headers']['location'];
-	wpgplus_debug("\nLine 294, My Redirect was ". $my_redirect ."\n");
+		foreach($new_cookies as $cookie) {
+			wpgplus_set_cookie($cookie);
+			$cookies[] = $cookie; 
+		}
+		$my_redirect = $buf['headers']['location'];
+		wpgplus_debug("\nLine 154, My Redirect was ". $my_redirect ."\n");
+	} // end of if loop for additional redirect
 
-	$my_args = array('method' => 'GET',
+	if($my_redirect) {
+		$my_args = array('method' => 'GET',
+						 'timeout' => '45',
+					 	'user-agent' => 'Mozilla/4.0 (compatible; MSIE 5.0; S60/3.0 NokiaN73-1/2.0(2.0617.0.0.7) Profile/MIDP-2.0 Configuration/CLDC-1.1)',
+					 	'blocking' => true,
+					 	'ssl-verify' => false,
+					 	'cookies' => $cookies,
+					 	'redirection' => 0,
+		);
+		/* * GET to https://accounts.google.com/CheckCookie
+	 	*   = 302 redirect to https://plus.google.com/app/plus/x/?login
+	 	*/ 
+		$buf = wp_remote_get($my_redirect,$my_args);
+		if(is_wp_error($buf)) {
+			wp_die($buf);
+		}
+		// need to check to see what cookies are new or updated
+		// $new_cookies = array of cookies returned by post
+		// $cookies = array of existing cookies sent
+		$new_cookies = $buf['cookies'];
+		for($x = count($cookies); $x>0; $x--) {
+			// if cookie is already in $cookies array, we remove old version		
+			foreach($new_cookies as $new_cookie) {
+				if($new_cookie->name == $cookies[$x]->name) {
+					unset($cookies[$x]);
+				}
+			}		
+		}
+		// now that existing cookies are out of the array, add all back in
+		foreach($new_cookies as $cookie) {
+			wpgplus_set_cookie($cookie);
+			$cookies[] = $cookie; 
+		}
+		$my_redirect = $buf['headers']['location'];
+		wpgplus_debug("\nLine 189, My Redirect was ". $my_redirect ."\n");
+	} // end of if loop for redirect 
+	
+	if($my_redirect) {
+		$my_args = array('method' => 'GET',
+		'timeout' => '45',
+		'user-agent' => 'Mozilla/4.0 (compatible; MSIE 5.0; S60/3.0 NokiaN73-1/2.0(2.0617.0.0.7) Profile/MIDP-2.0 Configuration/CLDC-1.1)',
+		'blocking' => true,
+		'ssl-verify' => false,
+		'cookies' => $cookies,
+		'redirection' => 0,
+		);
+		/* GET to https://plus.google.com/app/plus/x/?login
+		*   = 302 redirect to https://plus.google.com/app/plus/x/?login=1 
+		*/ 
+		$buf = wp_remote_get($my_redirect,$my_args);
+		if(is_wp_error($buf)) {
+			wp_die($buf);
+		}
+		// need to check to see what cookies are new or updated
+		// $new_cookies = array of cookies returned by post
+		// $cookies = array of existing cookies sent
+		$new_cookies = $buf['cookies'];
+		for($x = count($cookies); $x>0; $x--) {
+			// if cookie is already in $cookies array, we remove old version		
+			foreach($new_cookies as $new_cookie) {
+				if($new_cookie->name == $cookies[$x]->name) {
+					unset($cookies[$x]);
+				}
+			}		
+		}
+		// now that existing cookies are out of the array, add all back in
+		foreach($new_cookies as $cookie) {
+			wpgplus_set_cookie($cookie);
+			$cookies[] = $cookie; 
+		}
+		$my_redirect = $buf['headers']['location'];
+		wpgplus_debug("\nLine 224, My Redirect was ". $my_redirect ."\n");
+	} // end of if loop for redirect
+
+	if ($my_redirect) {
+		$my_args = array('method' => 'GET',
+			'timeout' => '45',
+			'user-agent' => 'Mozilla/4.0 (compatible; MSIE 5.0; S60/3.0 NokiaN73-1/2.0(2.0617.0.0.7) Profile/MIDP-2.0 Configuration/CLDC-1.1)',
+			'blocking' => true,
+			'ssl-verify' => false,
+			'cookies' => $cookies,
+			'redirection' => 0,
+		);
+		/* GET to https://plus.google.com/app/plus/x/?login=1
+		*   = 302 redirect to https://plus.google.com/app/plus/x/#/?login=1
+		*/ 
+		$buf = wp_remote_get($my_redirect,$my_args);
+		if(is_wp_error($buf)) {
+			wp_die($buf);
+		}
+		// need to check to see what cookies are new or updated
+		// $new_cookies = array of cookies returned by post
+		// $cookies = array of existing cookies sent
+		$new_cookies = $buf['cookies'];
+		for($x = count($cookies); $x>0; $x--) {
+			// if cookie is already in $cookies array, we remove old version		
+			foreach($new_cookies as $new_cookie) {
+				if($new_cookie->name == $cookies[$x]->name) {
+					unset($cookies[$x]);
+				}
+			}		
+		}
+		// now that existing cookies are out of the array, add all back in
+		foreach($new_cookies as $cookie) {
+			wpgplus_set_cookie($cookie);
+			$cookies[] = $cookie; 
+		}
+		$my_redirect = 'https://plus.google.com' . $buf['headers']['location']; // for some reason this time the url is relative
+		wpgplus_debug("\nLine 259, My Redirect was ". $my_redirect ."\n");
+	} // end of if loop for redirect
+	
+	if ($my_redirect) {
+		$my_args = array('method' => 'GET',
 					 'timeout' => '45',
 					 'user-agent' => 'Mozilla/4.0 (compatible; MSIE 5.0; S60/3.0 NokiaN73-1/2.0(2.0617.0.0.7) Profile/MIDP-2.0 Configuration/CLDC-1.1)',
 					 'blocking' => true,
 					 'ssl-verify' => false,
 					 'cookies' => $cookies,
 					 'redirection' => 0,
-	);
-	/* GET to https://plus.google.com/app/plus/x/?v=stream
-	 *   = 302 redirect to https://plus.google.com/app/plus/x/code/?v=stream
-	 */
-	$buf = wp_remote_get($my_redirect,$my_args); 
-	if(is_wp_error($buf)) {
-		wp_die($buf);
-	}
-	// need to check to see what cookies are new or updated
-	// $new_cookies = array of cookies returned by post
-	// $cookies = array of existing cookies sent
-	$new_cookies = $buf['cookies'];
-	for($x = count($cookies); $x>0; $x--) {
-		// if cookie is already in $cookies array, we remove old version		
-		foreach($new_cookies as $new_cookie) {
-			if($new_cookie->name == $cookies[$x]->name) {
-				unset($cookies[$x]);
-			}
-		}		
-	}
-	// now that existing cookies are out of the array, add all back in
-	foreach($new_cookies as $cookie) {
-		wpgplus_set_cookie($cookie);
-		$cookies[] = $cookie; 
-	}
+		);
+		/* GET to https://plus.google.com/app/plus/x/#/?login=1
+		*   = 302 redirect to https://plus.google.com/app/plus/x/?v=stream
+		*/
+		$buf = wp_remote_get($my_redirect,$my_args);
+		if(is_wp_error($buf)) {
+			wp_die($buf);
+		}
+		// need to check to see what cookies are new or updated
+		// $new_cookies = array of cookies returned by post
+		// $cookies = array of existing cookies sent
+		$new_cookies = $buf['cookies'];
+		for($x = count($cookies); $x>0; $x--) {
+			// if cookie is already in $cookies array, we remove old version		
+			foreach($new_cookies as $new_cookie) {
+				if($new_cookie->name == $cookies[$x]->name) {
+					unset($cookies[$x]);
+				}
+			}		
+		}
+		// now that existing cookies are out of the array, add all back in
+		foreach($new_cookies as $cookie) {
+			wpgplus_set_cookie($cookie);
+			$cookies[] = $cookie; 
+		}
+		$my_redirect = $buf['headers']['location'];
+		wpgplus_debug("\nLine 294, My Redirect was ". $my_redirect ."\n");
+	} // end of if loop for redirect
+
+	if ($my_redirect) {
+		$my_args = array('method' => 'GET',
+					 'timeout' => '45',
+					 'user-agent' => 'Mozilla/4.0 (compatible; MSIE 5.0; S60/3.0 NokiaN73-1/2.0(2.0617.0.0.7) Profile/MIDP-2.0 Configuration/CLDC-1.1)',
+					 'blocking' => true,
+					 'ssl-verify' => false,
+					 'cookies' => $cookies,
+					 'redirection' => 0,
+		);
+		/* GET to https://plus.google.com/app/plus/x/?v=stream
+		*   = 302 redirect to https://plus.google.com/app/plus/x/code/?v=stream
+		*/
+		$buf = wp_remote_get($my_redirect,$my_args); 
+		if(is_wp_error($buf)) {
+			wp_die($buf);
+		}
+		// need to check to see what cookies are new or updated
+		// $new_cookies = array of cookies returned by post
+		// $cookies = array of existing cookies sent
+		$new_cookies = $buf['cookies'];
+		for($x = count($cookies); $x>0; $x--) {
+			// if cookie is already in $cookies array, we remove old version		
+			foreach($new_cookies as $new_cookie) {
+				if($new_cookie->name == $cookies[$x]->name) {
+					unset($cookies[$x]);
+				}
+			}		
+		}
+		// now that existing cookies are out of the array, add all back in
+		foreach($new_cookies as $cookie) {
+			wpgplus_set_cookie($cookie);
+			$cookies[] = $cookie; 
+		}
     
-	wpgplus_debug(date("Y-m-d H:i:s",time())." : login data posted\n");
-	//wpgplus_debug("\n cookies were \n" . print_r($cookies,true) ."\n");
-	//wpgplus_debug("\n Postdata was \n" . print_r($postdata[0],true) ."\n");
-	wpgplus_debug("\n Response from Google was \n" . print_r($buf['body'],true) ."\n");
+		wpgplus_debug(date("Y-m-d H:i:s",time())." : login data posted\n");
+		//wpgplus_debug("\n cookies were \n" . print_r($cookies,true) ."\n");
+		//wpgplus_debug("\n Postdata was \n" . print_r($postdata[0],true) ."\n");
+		wpgplus_debug("\n Response from Google was \n" . print_r($buf['body'],true) ."\n");
+	} // last if loop for redirect in login sequence
 }
 // Prepare the update, get the right form, post the update
 function wpgplus_update_profile_status($post_id) {	$wpgplus_debug_file= WP_PLUGIN_DIR .'/wpgplus/debug.txt';
@@ -414,11 +424,13 @@ function wpgplus_update_profile_status($post_id) {	$wpgplus_debug_file= WP_PLUGI
 	}
 	// form gets redirected to a new base url
 	$my_redirect = $buf['headers']['location']; 
-	//wpgplus_debug("\nShould be past redirect for form, response was ". print_r($buf,true) ."\n");
-    wpgplus_debug("\nLine 415, My Redirect was ". $my_redirect ."\n");	
-	//wpgplus_debug("\nGetting form at redirected url, cookies are ". print_r($cookies,true) ."\n"); 
-	// need to reget the form at the new url
-	$my_args = array('method' => 'GET',
+	
+	if ($my_redirect) {
+		wpgplus_debug("\nShould be past redirect for form, response was ". print_r($buf,true) ."\n");
+    	wpgplus_debug("\nLine 430, My Redirect was ". $my_redirect ."\n");	
+		wpgplus_debug("\nGetting form at redirected url, cookies are ". print_r($cookies,true) ."\n"); 
+		// need to reget the form at the new url
+		$my_args = array('method' => 'GET',
 					 'timeout' => '45',
 					 'redirection' => 0,
 					 'user-agent' => 'Mozilla/4.0 (compatible; MSIE 5.0; S60/3.0 NokiaN73-1/2.0(2.0617.0.0.7) Profile/MIDP-2.0 Configuration/CLDC-1.1)',
@@ -428,28 +440,30 @@ function wpgplus_update_profile_status($post_id) {	$wpgplus_debug_file= WP_PLUGI
 					 'ssl-verify' => false,
 					 'cookies' => $cookies,
 					);					    	
-	$buf = wp_remote_request($my_redirect, $my_args); 
-	if(is_wp_error($buf)) {
-		wp_die($buf);
-	}
-	$new_cookies = $buf['cookies'];
-	for($x = count($cookies); $x>0; $x--) {
-		// if cookie is already in $cookies array, we remove old version		
-		foreach($new_cookies as $new_cookie) {
-			if($new_cookie->name == $cookies[$x]->name) {
-				//wpgplus_debug("\nUnsetting cookie for ". $cookies[$x]->name); 
-				unset($cookies[$x]);
-			}
-		}		
-	}
-	// now that existing cookies are out of the array, add all back in
-	foreach($new_cookies as $cookie) {
-		wpgplus_set_cookie($cookie);
-		$cookies[] = $cookie; 
-	}
-	//wpgplus_debug("\nGot new form at new url, cookies are now ". print_r($cookies,true) ."\n");
-	//wpgplus_debug("\nForm being parsed is in ". $buf['body'] ."\n");
+		$buf = wp_remote_request($my_redirect, $my_args); 
+		if(is_wp_error($buf)) {
+			wp_die($buf);
+		}
+		$new_cookies = $buf['cookies'];
+		for($x = count($cookies); $x>0; $x--) {
+			// if cookie is already in $cookies array, we remove old version		
+			foreach($new_cookies as $new_cookie) {
+				if($new_cookie->name == $cookies[$x]->name) {
+					//wpgplus_debug("\nUnsetting cookie for ". $cookies[$x]->name); 
+					unset($cookies[$x]);
+				}
+			}		
+		}
+		// now that existing cookies are out of the array, add all back in
+		foreach($new_cookies as $cookie) {
+			wpgplus_set_cookie($cookie);
+			$cookies[] = $cookie; 
+		}
+		wpgplus_debug("\nGot new form at new url, cookies are now ". print_r($cookies,true) ."\n");
+		
+	} 
 	// now we get the form inputs, including hidden ones
+	wpgplus_debug("\nForm being parsed is in ". $buf['body'] ."\n");
 	$params = array();
     $doc = new DOMDocument;
     $doc->loadHTML($buf['body']);
