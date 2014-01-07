@@ -439,7 +439,8 @@ function wpgplus_update_profile_status($post_id) {	$wpgplus_debug_file= WP_PLUGI
 					 'decompress' => true,
 					 'ssl-verify' => false,
 					 'cookies' => $cookies,
-					);					    	
+					);
+		$my_redirect = 'https://plus.google.com' . $my_redirect; 					    	
 		$buf = wp_remote_request($my_redirect, $my_args); 
 		if(is_wp_error($buf)) {
 			wp_die($buf);
@@ -473,12 +474,21 @@ function wpgplus_update_profile_status($post_id) {	$wpgplus_debug_file= WP_PLUGI
 			$params[$input->getAttribute('name')] =  $input->getAttribute('value');
 	    }
 	}
-    $params['newcontent'] = $my_post_text . ' ' . get_permalink($my_post);
+    $params['cpPostMsg'] = $my_post_text . ' ' . get_permalink($my_post);
 	$params['post'] = ' Post ';  // input type="submit" important too? 
+	$params['currentPage'] = '1';
+	$params['buttonPressed'] = '1 ';
 	
-	// need to determine baseul from the last get, then add the right query string
+	foreach ($params as $key => $value)
+	{
+	    $post_items[] = $key . '=' . urlencode($value);
+	}
+	$params = implode ('&', $post_items);
+	
+	// need to determine form url from the form action
 	sleep(6); 
-	$baseurl = $my_redirect;
+	$forms = $doc->getElementsByTagName('form');
+	$baseurl = 'https://plus.google.com'. $forms->item(0)->getAttribute('action');
 	wpgplus_debug(date("Y-m-d H:i:s",time())." : Going to publish, params is ". print_r($params,true) ."\n");
 	wpgplus_debug(date("Y-m-d H:i:s",time())." : and base url is ". $baseurl ."\n");
 	
@@ -493,9 +503,10 @@ function wpgplus_update_profile_status($post_id) {	$wpgplus_debug_file= WP_PLUGI
 					 'ssl-verify' => false,
 					 'body' => $params,
 					 'cookies' => $cookies,
-					 'headers' => array('Referer' => $baseurl),
+					 'headers' => array('Referer' => $my_redirect, ),
 					);
-	$buf = wp_remote_post($baseurl . '&a=post',$my_args);
+	//$buf = wp_remote_post($baseurl . '&a=post',$my_args);
+	$buf = wp_remote_post($baseurl,$my_args);
 	if(is_wp_error($buf)) {
 		wp_die($buf);
 	}	
