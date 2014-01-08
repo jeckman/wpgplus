@@ -477,7 +477,7 @@ function wpgplus_update_profile_status($post_id) {	$wpgplus_debug_file= WP_PLUGI
     $params['cpPostMsg'] = $my_post_text . ' ' . get_permalink($my_post);
 	$params['post'] = ' Post ';  // input type="submit" important too? 
 	$params['currentPage'] = '1';
-	$params['buttonPressed'] = '1 ';
+	$params['buttonPressed'] = '1';
 	
 	foreach ($params as $key => $value)
 	{
