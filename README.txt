@@ -1,11 +1,20 @@
 === WPGPlus ===
 Contributors: johneckman
 Tags: google plus, platform, application, blog
-Stable tag: 0.8.5
-Tested up to: 3.3.2
+Stable tag: 0.8.6
+Tested up to: 3.8
 Requires at least: 3.2
 
 WPGPlus posts your blog posts to Google+ when published on WordPress blog. 
+
+Currently works with plus.google.com accounts, provided:
+ - You are NOT using "2 factor authentication"
+ - You have accepted the terms of service and can successfully post using
+   http://plus.google.com/app/basic/share/ on a mobile device
+   
+It does store your Google+ username and password in the WordPress database. 
+This is not ideal from a security POV but is the only way to get it working when you
+are not present to login. 
 
 == Description ==
 
@@ -74,6 +83,13 @@ you could hack the wpgplus_login_data() function and hard-code your username and
 password into it - they'd still be accessible to someone with filesystem access. 
 
 == Changelog ==
+
+= 0.8.6 = 
+* Restarting development. Got a test version working with Google+ in the us - changes
+  to all the redirects it goes through, now using /app/basic/share/ instead of the 
+  older mobile version
+* Updating notes in the readme to clarify what does not work - 2 factor auth, non-US
+
 = 0.8.5 =
 * Setting redirection back to 5 on the login check. I'd prefer not to rely on redirection
   this way, given that on some hosts curl redirection isn't allowed, but that will require
