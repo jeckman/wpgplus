@@ -503,7 +503,9 @@ function wpgplus_update_profile_status($post_id) {	$wpgplus_debug_file= WP_PLUGI
 					 'ssl-verify' => false,
 					 'body' => $params,
 					 'cookies' => $cookies,
-					 'headers' => array('Referer' => $my_redirect, ),
+					 'headers' => array('Referer' => $my_redirect,
+					 				'Content-Type' => 'application/x-www-form-urlencoded',
+									'Content-Length' => strlen($params),)
 					);
 	//$buf = wp_remote_post($baseurl . '&a=post',$my_args);
 	$buf = wp_remote_post($baseurl,$my_args);
