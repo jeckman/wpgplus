@@ -503,10 +503,11 @@ function wpgplus_update_profile_status($post_id) {	$wpgplus_debug_file= WP_PLUGI
 					 'ssl-verify' => false,
 					 'body' => $params,
 					 'cookies' => $cookies,
-					 'headers' => array('Referer' => $my_redirect,
+					 'headers' => array('Referer' => 'https://plus.google.com/app/basic/share',
 					 				'Content-Type' => 'application/x-www-form-urlencoded',
-									'Content-Length' => strlen($params),)
+									'Content-Length' => strlen($params))
 					);
+	wpgplus_debug(date("Y-m-d H:i:s",time())." : About to post form, my_args are ". print_r($my_args,true). "\n");
 	//$buf = wp_remote_post($baseurl . '&a=post',$my_args);
 	$buf = wp_remote_post($baseurl,$my_args);
 	if(is_wp_error($buf)) {
