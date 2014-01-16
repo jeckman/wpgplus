@@ -192,7 +192,10 @@ function wpgplus_login($postdata) {
 		$my_redirect = $buf['headers']['location'];
 		wpgplus_debug("\nLine 189, My Redirect was ". $my_redirect ."\n");
 	} // end of if loop for redirect 
-	
+	if(substr($my_redirect, 0, 1) == '/') {
+		$my_redirect = 'http://plus.google.com' . $my_redirect;
+	}
+
 	if($my_redirect) {
 		$my_args = array('method' => 'GET',
 		'timeout' => '45',
