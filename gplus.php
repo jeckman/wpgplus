@@ -402,7 +402,7 @@ function wpgplus_update_profile_status($post_id) {	$wpgplus_debug_file= WP_PLUGI
 					 'cookies' => $cookies,
 					);					    	
 	// Need to get from this URL and follow redirects				
-	$buf = wp_remote_request('https://m.google.com/app/plus/x/?v=compose&group=b0&hideloc=1',$my_args); 
+	$buf = wp_remote_request('https://plus.google.com/app/basic/share',$my_args); 
 	if(is_wp_error($buf)) {
 		wp_die($buf);
 	}
@@ -428,6 +428,10 @@ function wpgplus_update_profile_status($post_id) {	$wpgplus_debug_file= WP_PLUGI
 	// form gets redirected to a new base url
 	$my_redirect = $buf['headers']['location']; 
 	
+	if(substr($my_redirect, 0, 1) == '/') {
+		$my_redirect = 'http://plus.google.com' . $my_redirect;
+	}
+	
 	if ($my_redirect) {
 		wpgplus_debug("\nShould be past redirect for form, response was ". print_r($buf,true) ."\n");
     	wpgplus_debug("\nLine 430, My Redirect was ". $my_redirect ."\n");	
@@ -443,7 +447,6 @@ function wpgplus_update_profile_status($post_id) {	$wpgplus_debug_file= WP_PLUGI
 					 'ssl-verify' => false,
 					 'cookies' => $cookies,
 					);
-		$my_redirect = 'https://plus.google.com' . $my_redirect; 					    	
 		$buf = wp_remote_request($my_redirect, $my_args); 
 		if(is_wp_error($buf)) {
 			wp_die($buf);

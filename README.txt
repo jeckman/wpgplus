@@ -84,6 +84,11 @@ password into it - they'd still be accessible to someone with filesystem access.
 
 == Changelog ==
 
+* Added better checking for redirects where the 'baseurl' is not returned as part of the
+  redirect and has to be manually added. For now I'm just adding plus.google.com but 
+  ultimately this will need to be parameterized
+* Request form directly at /app/basic/share/ rather than old url  
+
 = 0.8.6 = 
 * Restarting development. Got a test version working with Google+ in the us - changes
   to all the redirects it goes through, now using /app/basic/share/ instead of the 
