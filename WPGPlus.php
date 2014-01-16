@@ -1,12 +1,12 @@
 <?php
 /*
 Plugin Name: WPGplus
-Date: 2013, January 7th
+Date: 2014, January 16th
 Description: Plugin to cross-post WordPress blog posts to Google+ 
 Author: John Eckman
 Author URI: http://johneckman.com
-Version: 0.8.6
-Stable tag: 0.8.6
+Version: 0.8.7
+Stable tag: 0.8.7
 */
   
 /*

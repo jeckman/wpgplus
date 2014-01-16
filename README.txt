@@ -1,7 +1,7 @@
 === WPGPlus ===
 Contributors: johneckman
 Tags: google plus, platform, application, blog
-Stable tag: 0.8.6
+Stable tag: 0.8.7
 Tested up to: 3.8
 Requires at least: 3.2
 
@@ -84,6 +84,7 @@ password into it - they'd still be accessible to someone with filesystem access.
 
 == Changelog ==
 
+= 0.8.7 = 
 * Added better checking for redirects where the 'baseurl' is not returned as part of the
   redirect and has to be manually added. For now I'm just adding plus.google.com but 
   ultimately this will need to be parameterized
