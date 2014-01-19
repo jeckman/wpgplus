@@ -545,31 +545,31 @@ function wpgplus_update_profile_status($post_id) {	$wpgplus_debug_file= WP_PLUGI
 	
 	$forms = $doc->getElementsByTagName('form');
 	/* the image posting form is the third form on the page */ 
-	$image_file = wp_get_attachment_thumb_file($my_thumb_id); 
+	$image_file =  get_attached_file($my_thumb_id); 
 	$referer = $baseurl; 
 	$baseurl = 'https://plus.google.com'. $forms->item(2)->getAttribute('action');
+	wpgplus_debug(date("Y-m-d H:i:s",time())." : Image file is " . $image_file . "\n");
 	wpgplus_debug(date("Y-m-d H:i:s",time())." : Going to post image upload form, ");
 	wpgplus_debug(date("Y-m-d H:i:s",time())." : and base url is ". $baseurl ."\n");
-	$boundary = '---------------------------'. 'asdlkjDLKJasd' ;
+	$boundary = 'asdlkjDLKJasd';
 	
 	$payload = '';
 
 	// First, add the standard POST fields:
 	foreach ($params as $key => $value) {
-	        $payload .= $boundary;
+	        $payload .= '-----'. $boundary;
 	        $payload .= "\r\n";
-	        $payload .= 'Content-Disposition: form-data; name="' . $key .
-	'"' . "\r\n\r\n";
+	        $payload .= 'Content-Disposition: form-data; name="'. $key .'"'."\r\n\r\n";
 	        $payload .= $value;
 	        $payload .= "\r\n";
 	}
 	
 	// Add the file
-			$payload .= $boundary;
+			$payload .= '-----'. $boundary;
 	        $payload .= "\r\n";
-	        $payload .= 'Content-Disposition: form-data; name="' . $name .
-	'"; filename="' . basename($image_file) . '"' . "\r\n";
-	        $payload .= 'Content-Type: image/jpeg' . "\r\n"; // If you	know the mime-type
+	        $payload .= 'Content-Disposition: form-data; name="photo_upload_file_name"; filename="' . basename($image_file) . '"' . "\r\n";
+	        $payload .= 'Content-Type: image/png' . "\r\n"; // If you	know the mime-type
+			$payload .= 'Content-Transfer-Encoding: binary' . "\r\n";			
 	        $payload .= "\r\n";
 	        $payload .= file_get_contents($image_file);
 	        $payload .= "\r\n";
@@ -587,10 +587,10 @@ function wpgplus_update_profile_status($post_id) {	$wpgplus_debug_file= WP_PLUGI
 					 'body' => $payload,
 					 'cookies' => $cookies,
 					 'headers' => array('Referer' => $referer,
-					 				'content-type' => 'multipart/form-data; boundary=' . $boundary,
+					 				'content-type' => 'multipart/form-data; boundary='. $boundary,
 									'Content-Length' => strlen($payload))
 					);
-	wpgplus_debug(date("Y-m-d H:i:s",time())." : About to post form for uplaoding image, payload is ". $payload ."\n");
+	wpgplus_debug(date("Y-m-d H:i:s",time())." : About to post form for uplaoding image\n");
 	$buf = wp_remote_post($baseurl,$my_args);
 	if(is_wp_error($buf)) {
 		wp_die($buf);
@@ -603,8 +603,7 @@ function wpgplus_update_profile_status($post_id) {	$wpgplus_debug_file= WP_PLUGI
 	
 	/* then we're ready to post the whole thing, including image references */ 
 	/* really at this point we need to go get the whole original form perhaps, or at least reset the action */ 
-	
-	
+		
 	$params['cpPostMsg'] = $my_post_text . ' ' . get_permalink($my_post);
 	$params['currentPage'] = '1';
 	$params['buttonPressed'] = '1';
