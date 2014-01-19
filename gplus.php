@@ -425,7 +425,7 @@ function wpgplus_update_profile_status($post_id) {	$wpgplus_debug_file= WP_PLUGI
 		wpgplus_set_cookie($cookie);
 		$cookies[] = $cookie; 
 	}
-	// form gets redirected to a new base url
+	// in case form gets redirected to a new base url
 	$my_redirect = $buf['headers']['location']; 
 	
 	if(substr($my_redirect, 0, 1) == '/') {
@@ -480,10 +480,38 @@ function wpgplus_update_profile_status($post_id) {	$wpgplus_debug_file= WP_PLUGI
 			$params[$input->getAttribute('name')] =  $input->getAttribute('value');
 	    }
 	}
-    $params['cpPostMsg'] = $my_post_text . ' ' . get_permalink($my_post);
+    
+	if (function_exists('get_the_post_thumbnail') && has_post_thumbnail($my_post->ID)) {     
+		$my_thumb_id = get_post_thumbnail_id($my_post->ID);
+		$my_thumb_array = wp_get_attachment_image_src($my_thumb_id);
+		$my_image = $my_thumb_array[0]; // this should be the url
+	} else {  
+		$my_image = '';
+	}
+	
+	/*
+	 * In order to pass an image, these are the parameters sent along with the post date. 
+	 * Problem is you can't just provide them - the image needs to be uploaded first into 
+	 * google's servers, then can be referenced. 
+	 *
+	 * Need to reverse-engineer that post, which is a complex mime-multipart and then
+	 * fills out the form using ajax? 
+	 */ 
+	 
+	// cpPostMsg
+	// cpPhotoId=5966323759483273746 
+	// cpPhotoTitle=129189464377164853.jpg
+	// cpPhotoOwnerId=116299145125384516090
+	// cpPhotoUrl=  (url)
+	
+	
+	$params['cpPostMsg'] = $my_post_text . ' ' . get_permalink($my_post);
 	$params['post'] = ' Post ';  // input type="submit" important too? 
 	$params['currentPage'] = '1';
 	$params['buttonPressed'] = '1';
+	$params['cpPhotoUrl'] = $my_image; 
+	$params['cpPhotoTitle'] = '';
+	
 	
 	foreach ($params as $key => $value)
 	{
