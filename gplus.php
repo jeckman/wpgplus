@@ -551,13 +551,13 @@ function wpgplus_update_profile_status($post_id) {	$wpgplus_debug_file= WP_PLUGI
 	wpgplus_debug(date("Y-m-d H:i:s",time())." : Image file is " . $image_file . "\n");
 	wpgplus_debug(date("Y-m-d H:i:s",time())." : Going to post image upload form, ");
 	wpgplus_debug(date("Y-m-d H:i:s",time())." : and base url is ". $baseurl ."\n");
-	$boundary = 'asdlkjDLKJasd';
+	$boundary = md5(time());
 	
 	$payload = '';
 
 	// First, add the standard POST fields:
 	foreach ($params as $key => $value) {
-	        $payload .= '-----'. $boundary;
+	        $payload .= '--'. $boundary;
 	        $payload .= "\r\n";
 	        $payload .= 'Content-Disposition: form-data; name="'. $key .'"'."\r\n\r\n";
 	        $payload .= $value;
@@ -565,7 +565,7 @@ function wpgplus_update_profile_status($post_id) {	$wpgplus_debug_file= WP_PLUGI
 	}
 	
 	// Add the file
-			$payload .= '-----'. $boundary;
+			$payload .= '--'. $boundary;
 	        $payload .= "\r\n";
 	        $payload .= 'Content-Disposition: form-data; name="photo_upload_file_name"; filename="' . basename($image_file) . '"' . "\r\n";
 	        $payload .= 'Content-Type: image/png' . "\r\n"; // If you	know the mime-type
@@ -575,6 +575,7 @@ function wpgplus_update_profile_status($post_id) {	$wpgplus_debug_file= WP_PLUGI
 	        $payload .= "\r\n";
 
 	$payload .= '--' . $boundary . '--';
+	$payload .= "\r\n\r\n";
 
    	$my_args = array('method' => 'POST',
 					 'timeout' => 45,
@@ -590,7 +591,7 @@ function wpgplus_update_profile_status($post_id) {	$wpgplus_debug_file= WP_PLUGI
 					 				'content-type' => 'multipart/form-data; boundary='. $boundary,
 									'Content-Length' => strlen($payload))
 					);
-	wpgplus_debug(date("Y-m-d H:i:s",time())." : About to post form for uplaoding image\n");
+	wpgplus_debug(date("Y-m-d H:i:s",time())." : About to post form for uploading image, payload is ". $payload ."\n");
 	$buf = wp_remote_post($baseurl,$my_args);
 	if(is_wp_error($buf)) {
 		wp_die($buf);
