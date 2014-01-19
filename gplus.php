@@ -42,8 +42,8 @@ function wpgplus_login_data() {
 					);
 	$buf = wp_remote_get('https://plus.google.com/',$my_args);
 	wpgplus_debug(date("Y-m-d H:i:s",time())." : just requested the login info\n");
-	wpgplus_debug("\nBuffer is\n". print_r($buf,true) . "\n");
-	wpgplus_debug("\nWriting cookies from login get\n");
+	//wpgplus_debug("\nBuffer is\n". print_r($buf,true) . "\n");
+	//wpgplus_debug("\nWriting cookies from login get\n");
 	if(is_wp_error($buf)) {
 		wp_die($buf);
 	}
@@ -120,7 +120,7 @@ function wpgplus_login($postdata) {
 		$cookies[] = $cookie; 
 	}
 	$my_redirect = $buf['headers']['location'];
-	wpgplus_debug("\nLine 120, My Redirect was ". $my_redirect ."\n");
+	//wpgplus_debug("\nLine 120, My Redirect was ". $my_redirect ."\n");
 	
 	if($my_redirect) {
 		$my_args = array('method' => 'GET',
@@ -153,7 +153,7 @@ function wpgplus_login($postdata) {
 			$cookies[] = $cookie; 
 		}
 		$my_redirect = $buf['headers']['location'];
-		wpgplus_debug("\nLine 154, My Redirect was ". $my_redirect ."\n");
+		//wpgplus_debug("\nLine 154, My Redirect was ". $my_redirect ."\n");
 	} // end of if loop for additional redirect
 
 	if($my_redirect) {
@@ -470,7 +470,7 @@ function wpgplus_update_profile_status($post_id) {	$wpgplus_debug_file= WP_PLUGI
 		
 	} 
 	// now we get the form inputs, including hidden ones
-	wpgplus_debug("\nForm being parsed is in ". $buf['body'] ."\n");
+	wpgplus_debug("\nForm being parsed is this page: ". $buf['body'] ."\n");
 	$params = array();
     $doc = new DOMDocument;
     $doc->loadHTML($buf['body']);
@@ -489,27 +489,123 @@ function wpgplus_update_profile_status($post_id) {	$wpgplus_debug_file= WP_PLUGI
 		$my_image = '';
 	}
 	
-	/*
-	 * In order to pass an image, these are the parameters sent along with the post date. 
-	 * Problem is you can't just provide them - the image needs to be uploaded first into 
-	 * google's servers, then can be referenced. 
-	 *
-	 * Need to reverse-engineer that post, which is a complex mime-multipart and then
-	 * fills out the form using ajax? 
-	 */ 
-	 
-	// cpPostMsg
-	// cpPhotoId=5966323759483273746 
-	// cpPhotoTitle=129189464377164853.jpg
-	// cpPhotoOwnerId=116299145125384516090
-	// cpPhotoUrl=  (url)
+	/* first, lets submit the current form using the 'add image' button */ 
+	$params['cpPostMsg'] = '';
+	$params['currentPage'] = '1';
+	$params['buttonPressed'] = '2'; // pushign the second button should open the add image dialog
+	$params['cpPhotoTitle'] = '';
 	
+	foreach ($params as $key => $value)
+	{
+	    $post_items[] = $key . '=' . urlencode($value);
+	}
+	$params = implode ('&', $post_items);
+	
+	// need to determine form url from the form action
+	sleep(6); 
+	$forms = $doc->getElementsByTagName('form');
+	$baseurl = 'https://plus.google.com'. $forms->item(0)->getAttribute('action');
+	wpgplus_debug(date("Y-m-d H:i:s",time())." : Posting share form, to get image form\n");
+	//wpgplus_debug(date("Y-m-d H:i:s",time())." : and base url is ". $baseurl ."\n");
+	
+	// This last post should NOT follow redirects
+   	$my_args = array('method' => 'POST',
+					 'timeout' => 45,
+					 'user-agent' => 'Mozilla/4.0 (compatible; MSIE 5.0; S60/3.0 NokiaN73-1/2.0(2.0617.0.0.7) Profile/MIDP-2.0 Configuration/CLDC-1.1)',
+					 'redirection' => 0,
+					 'blocking' => true,
+					 'compress' => false,
+					 'decompress' => true,
+					 'ssl-verify' => false,
+					 'body' => $params,
+					 'cookies' => $cookies,
+					 'headers' => array('Referer' => 'https://plus.google.com/app/basic/share',
+					 				'Content-Type' => 'application/x-www-form-urlencoded',
+									'Content-Length' => strlen($params))
+					);
+	//wpgplus_debug(date("Y-m-d H:i:s",time())." : About to post form, my_args are ". print_r($my_args,true). "\n");
+	$buf = wp_remote_post($baseurl,$my_args);
+	if(is_wp_error($buf)) {
+		wp_die($buf);
+	}	
+	$header = $buf['headers'];
+	//wpgplus_debug(date("Y-m-d H:i:s",time())." : Requested form, status was ". $buf['response']['code']	. "\n");
+	
+	/* now we need to parse that form, to figure out how to send the images */ 
+	wpgplus_debug("\nForm being parsed for image posting \n");
+	$params = array();
+    $doc = new DOMDocument;
+    $doc->loadHTML($buf['body']);
+    $inputs = $doc->getElementsByTagName('input');
+    foreach ($inputs as $input) {
+	    if (($input->getAttribute('type') == 'hidden')) {
+			$params[$input->getAttribute('name')] =  $input->getAttribute('value');
+	    }
+	}
+	
+	$forms = $doc->getElementsByTagName('form');
+	/* the image posting form is the third form on the page */ 
+	$image_file = wp_get_attachment_thumb_file($my_thumb_id); 
+	$referer = $baseurl; 
+	$baseurl = 'https://plus.google.com'. $forms->item(2)->getAttribute('action');
+	wpgplus_debug(date("Y-m-d H:i:s",time())." : Going to post image upload form, ");
+	wpgplus_debug(date("Y-m-d H:i:s",time())." : and base url is ". $baseurl ."\n");
+	$boundary = '---------------------------'. 'asdlkjDLKJasd' ;
+	
+	$payload = '';
+
+	// First, add the standard POST fields:
+	foreach ($params as $key => $value) {
+	        $payload .= $boundary;
+	        $payload .= "\r\n";
+	        $payload .= 'Content-Disposition: form-data; name="' . $key .
+	'"' . "\r\n\r\n";
+	        $payload .= $value;
+	        $payload .= "\r\n";
+	}
+	
+	// Add the file
+			$payload .= $boundary;
+	        $payload .= "\r\n";
+	        $payload .= 'Content-Disposition: form-data; name="' . $name .
+	'"; filename="' . basename($image_file) . '"' . "\r\n";
+	        $payload .= 'Content-Type: image/jpeg' . "\r\n"; // If you	know the mime-type
+	        $payload .= "\r\n";
+	        $payload .= file_get_contents($image_file);
+	        $payload .= "\r\n";
+
+	$payload .= '--' . $boundary . '--';
+
+   	$my_args = array('method' => 'POST',
+					 'timeout' => 45,
+					 'user-agent' => 'Mozilla/4.0 (compatible; MSIE 5.0; S60/3.0 NokiaN73-1/2.0(2.0617.0.0.7) Profile/MIDP-2.0 Configuration/CLDC-1.1)',
+					 'redirection' => 0,
+					 'blocking' => true,
+					 'compress' => false,
+					 'decompress' => true,
+					 'ssl-verify' => false,
+					 'body' => $payload,
+					 'cookies' => $cookies,
+					 'headers' => array('Referer' => $referer,
+					 				'content-type' => 'multipart/form-data; boundary=' . $boundary,
+									'Content-Length' => strlen($payload))
+					);
+	wpgplus_debug(date("Y-m-d H:i:s",time())." : About to post form for uplaoding image\n");
+	$buf = wp_remote_post($baseurl,$my_args);
+	if(is_wp_error($buf)) {
+		wp_die($buf);
+	}	
+	$header = $buf['headers'];
+	wpgplus_debug(date("Y-m-d H:i:s",time())." : Posted form (image upload), status was ". $buf['response']['code']	. "\n");
+	//wpgplus_debug(date("Y-m-d H:i:s",time())." : Post text was ". $my_post_text ."\n");	
+	//wpgplus_debug(date("Y-m-d H:i:s",time())." : Header of response was ". print_r($header,true) ."\n");
+	wpgplus_debug(date("Y-m-d H:i:s",time())." : Response was ". $buf['body'] ."\n");
+	
+	/* then we're ready to post the whole thing, including image references */ 
 	
 	$params['cpPostMsg'] = $my_post_text . ' ' . get_permalink($my_post);
-	$params['post'] = ' Post ';  // input type="submit" important too? 
 	$params['currentPage'] = '1';
 	$params['buttonPressed'] = '1';
-	$params['cpPhotoUrl'] = $my_image; 
 	$params['cpPhotoTitle'] = '';
 	
 	
@@ -542,7 +638,6 @@ function wpgplus_update_profile_status($post_id) {	$wpgplus_debug_file= WP_PLUGI
 									'Content-Length' => strlen($params))
 					);
 	wpgplus_debug(date("Y-m-d H:i:s",time())." : About to post form, my_args are ". print_r($my_args,true). "\n");
-	//$buf = wp_remote_post($baseurl . '&a=post',$my_args);
 	$buf = wp_remote_post($baseurl,$my_args);
 	if(is_wp_error($buf)) {
 		wp_die($buf);
