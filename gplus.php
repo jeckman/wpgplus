@@ -190,7 +190,7 @@ function wpgplus_login($postdata) {
 			$cookies[] = $cookie; 
 		}
 		$my_redirect = $buf['headers']['location'];
-		wpgplus_debug("\nLine 189, My Redirect was ". $my_redirect ."\n");
+		//wpgplus_debug("\nLine 189, My Redirect was ". $my_redirect ."\n");
 	} // end of if loop for redirect 
 	if(substr($my_redirect, 0, 1) == '/') {
 		$my_redirect = 'http://plus.google.com' . $my_redirect;
@@ -590,7 +590,7 @@ function wpgplus_update_profile_status($post_id) {	$wpgplus_debug_file= WP_PLUGI
 					 				'content-type' => 'multipart/form-data; boundary=' . $boundary,
 									'Content-Length' => strlen($payload))
 					);
-	wpgplus_debug(date("Y-m-d H:i:s",time())." : About to post form for uplaoding image\n");
+	wpgplus_debug(date("Y-m-d H:i:s",time())." : About to post form for uplaoding image, payload is ". $payload ."\n");
 	$buf = wp_remote_post($baseurl,$my_args);
 	if(is_wp_error($buf)) {
 		wp_die($buf);
@@ -602,6 +602,8 @@ function wpgplus_update_profile_status($post_id) {	$wpgplus_debug_file= WP_PLUGI
 	wpgplus_debug(date("Y-m-d H:i:s",time())." : Response was ". $buf['body'] ."\n");
 	
 	/* then we're ready to post the whole thing, including image references */ 
+	/* really at this point we need to go get the whole original form perhaps, or at least reset the action */ 
+	
 	
 	$params['cpPostMsg'] = $my_post_text . ' ' . get_permalink($my_post);
 	$params['currentPage'] = '1';
